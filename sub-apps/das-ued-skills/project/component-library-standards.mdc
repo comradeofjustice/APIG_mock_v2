@@ -1,0 +1,167 @@
+---
+description: 本项目组件库优先级规则与视觉质量底线。在所有涉及 Vue 代码生成、组件选型、代码审查的任务中自动生效。覆盖 opt-pencil-to-code skill 的默认模式判断——本项目恒为 design-system 模式，无需用户确认。
+globs:
+  - "src/**/*.vue"
+  - "src/**/*.ts"
+alwaysApply: false
+---
+
+# 组件库标准与视觉质量规则
+
+## 模式声明（覆盖 skill 默认）
+
+**本项目恒为 design-system 模式。**
+
+在 `opt-pencil-to-code` 工作流中，无需激活 `b-admin-design-system` skill，无需用户确认，直接执行 design-system 模式。读取 `opt/pencil-to-code/references/design-system-mode.md` 作为代码生成规范。
+
+---
+
+## 组件优先级（das-* > a-* > 禁止裸 HTML）
+
+### 第一优先级：das-component-vue（`das-*` / `Das*`）
+
+以下场景必须使用 das-component-vue 组件，**不得用 antd 或裸 HTML 替代**：
+
+| 场景 | 必用组件 | 禁止替代 |
+|------|---------|---------|
+| 搜索 + 筛选工具栏 | `<DasSearchBar>` | `<a-form>` + `<a-input>` 手拼 |
+| 数据表格 | `<DasTable>` | `<a-table>` |
+| 指标数字卡 | `<DasMetricCard>` | 自定义 div |
+| 详情键值对面板 | `<DasDetail>` | 自定义 `<dl>` 或 `<table>` |
+| 表单分块 | `<DasFormGroup>` | `<a-form>` 直接铺 |
+| Tab 导航 | `<DasTabs>` | `<a-tabs>` |
+| 空状态 | `<DasEmpty>` | 空白区域或纯文字提示 |
+| 信息提示条 | `<DasAlert>` | `<a-alert>` |
+| 状态徽章 | `<DasBadge>` | 自定义 span |
+| 风险/状态标签 | `<DasTag>` | `<a-tag>` 或纯文字 |
+| 侧滑详情面板 | `<DasDrawer>` | `<a-drawer>` |
+| 树形控件 | `<DasTree>` | `<a-tree>` |
+| 穿梭框 | `<DasTransfer>` | `<a-transfer>` |
+| 侧边导航 | `<DasMenu>` | `<a-menu>` |
+
+### 第二优先级：Ant Design Vue（`a-*`）
+
+das-component-vue 没有覆盖的场景，使用 antd：
+
+| 场景 | 使用组件 |
+|------|---------|
+| 所有按钮 | `<a-button type="primary/default/danger/text">` |
+| 弹窗 | `<a-modal>` |
+| 输入框 | `<a-input>` / `<a-input-password>` |
+| 下拉选择 | `<a-select>` |
+| 日期 / 范围日期 | `<a-date-picker>` / `<a-range-picker>` |
+| 下拉菜单 | `<a-dropdown>` + `<a-menu>` |
+| 分页 | `<a-pagination>` |
+| 面包屑 | `<a-breadcrumb>` |
+| 加载状态（局部） | `<a-spin>` |
+| 骨架屏（页面级） | `<a-skeleton>` |
+| 气泡提示 | `<a-tooltip>` / `<a-popover>` |
+| 操作反馈 | `message.success()` / `message.error()` |
+| 布局辅助 | `<a-space>` / `<a-flex>` |
+| 数字输入 | `<a-input-number>` |
+| 开关 | `<a-switch>` |
+| 复选框 | `<a-checkbox>` |
+| 单选 | `<a-radio-group>` |
+| 上传 | `<a-upload>` |
+
+### 禁止清单（不得出现在代码中）
+
+```
+✗ <div @click="...">  →  必须用 <a-button>
+✗ <table><tr><td>     →  必须用 <DasTable>
+✗ <input type="text"> →  必须用 <a-input> 或 <DasInput>
+✗ <select><option>    →  必须用 <a-select> 或 <DasSelect>
+✗ style="color: #3B71EE"  →  必须用 var(--color-brand-normal)
+✗ style="background: #F3F5F9"  →  必须用 var(--color-bg-page)
+```
+
+---
+
+## 导入规范
+
+```vue
+<script setup lang="ts">
+import {
+  DasSearchBar,
+  DasTable,
+  DasMetricCard,
+  DasDetail,
+  DasTabs,
+  DasFormGroup,
+  DasEmpty,
+  DasAlert,
+  DasBadge,
+  DasTag,
+  DasDrawer,
+} from 'das-component-vue'
+import { message } from 'ant-design-vue'
+</script>
+```
+
+---
+
+## 视觉质量底线（所有生成代码必须满足）
+
+### 1. 交互状态
+
+所有可点击的自定义元素必须有 hover/active 态：
+
+```css
+.xxx-item {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.xxx-item:hover {
+  background: var(--color-brand-light);
+  border-color: var(--color-brand-normal);
+}
+```
+
+### 2. 颜色必须使用 CSS Token，禁止硬编码 hex
+
+```css
+/* ✓ 正确 */
+color: var(--color-text-primarys);
+background: var(--color-bg-container);
+border: 1px solid var(--color-component-border);
+
+/* ✗ 禁止 */
+color: #1d2129;
+background: #ffffff;
+border: 1px solid #d3deed;
+```
+
+### 3. 每个页面必须包含的三类交互
+
+| 类型 | 实现方式 |
+|------|---------|
+| 加载态 | `<a-skeleton>` 或 `<a-spin>` 包裹内容区 |
+| 空态 | `<DasEmpty>` + 操作引导文字 |
+| 操作反馈 | `message.success('操作成功')` / `message.error('操作失败')` |
+
+### 4. 页面根元素样式（必须包含）
+
+```css
+.xxx-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  min-height: 100%;
+  background: var(--color-bg-page);
+}
+```
+
+---
+
+## 代码审查检查项
+
+收到「检查代码是否符合规范」类请求时，逐项核查：
+
+- [ ] 是否有 `<DasTable>` 代替 `<a-table>` 或裸 `<table>`？
+- [ ] 是否有 `<DasSearchBar>` 代替手拼筛选区？
+- [ ] 是否用 CSS Token（`var(--...)`）而非 hex 颜色？
+- [ ] 是否有加载态、空态、操作反馈三类交互？
+- [ ] `<a-button>` 上是否有 `type` 属性（primary/default/danger/text）？
+- [ ] 操作列是否用 `<a-dropdown>` 收纳低频操作？
+- [ ] 状态/风险是否用 `<DasTag>` 或 `<DasBadge>` 而非纯文字？

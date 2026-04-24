@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>审批管理系统 | 变更治理中心</title>
+    <!-- Element Plus 样式 & 图标库 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css" />
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/theme-chalk/display.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f0f2f6;
+            overflow: hidden;
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px; }
+        .app-layout {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        /* 侧边栏 企业级 */
+        .sidebar {
+            width: 260px;
+            background: #fff;
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.05);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+        }
+        .logo-area {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            border-bottom: 1px solid #eef2f6;
+            font-weight: 600;
+            font-size: 18px;
+            background: #fff;
+            color: #1e80ff;
+        }
+        .menu-list {
+            flex: 1;
+            padding: 20px 12px;
+        }
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            margin-bottom: 6px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #3c4a5c;
+            transition: all 0.2s;
+        }
+        .menu-item i { margin-right: 12px; font-size: 18px; }
+        .menu-item.active { background: #eef4ff; color: #1e80ff; }
+        .menu-item:hover:not(.active) { background: #f5f7fa; color: #1e80ff; }
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .top-header {
+            height: 60px;
+            background: #fff;
+            border-bottom: 1px solid #eef2f6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+        }
+        .page-title { font-size: 20px; font-weight: 600; color: #1f2f3a; }
+        .content-view {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 28px;
+        }
+        .filter-bar { margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+        .match-info { background: #f0f7ff; border-left: 4px solid #1e80ff; padding: 12px 16px; border-radius: 12px; margin-bottom: 20px; }
+        .diff-json { background: #1e1e2f; color: #f8f8f2; padding: 14px; border-radius: 12px; font-size: 12px; font-family: monospace; white-space: pre-wrap; }
+        .timeline-item { font-size: 13px; padding: 8px 0; border-left: 2px solid #e4e7ed; margin-left: 16px; padding-left: 20px; }
+        .rule-preview-steps { background: #fafbfc; padding: 16px; border-radius: 12px; margin-top: 12px; }
+        .operation-trigger-card { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); border: 1px solid #e9ecef; }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="app-layout">
+        <div class="sidebar">
+            <div class="logo-area"><span>⚙️ 变更治理中心 | 审批系统</span></div>
+            <div class="menu-list">
+                <div v-for="item in menus" :key="item.key" class="menu-item" :class="{active: activeMenu === item.key}" @click="activeMenu = item.key">
+                    <i :class="item.icon"></i><span>{{ item.label }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="main-container">
+            <div class="top-header"><div class="page-title">{{ currentPageTitle }}</div><div><el-badge :value="pendingTaskCount" :hidden="pendingTaskCount===0"><el-avatar :size="36" src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png" /></el-badge></div></div>
+            <div class="content-view">
+
+                <!-- ========= 审批规则管理 ========= -->
+                <div v-if="activeMenu === 'ruleManage'">
+                    <div class="filter-bar"><el-button type="primary" @click="openRuleDialog(null)">+ 新增规则</el-button><el-input placeholder="规则名称" v-model="ruleSearch" style="width: 240px;" clearable></el-input></div>
+                    <el-table :data="filteredRules" border stripe>
+                        <el-table-column prop="name" label="规则名称" min-width="150"></el-table-column>
+                        <el-table-column prop="description" label="描述" min-width="150"></el-table-column>
+                        <el-table-column label="启用" width="80"><template #default="{row}"><el-switch v-model="row.enabled" @change="updateRule(row)"></el-switch></template></el-table-column>
+                        <el-table-column prop="priority" label="优先级" width="90"></el-table-column>
+                        <el-table-column label="适用模块" min-width="160"><template #default="{row}"><el-tag v-for="mod in row.modules.slice(0,2)" size="small" style="margin-right:4px">{{ mod }}</el-tag><span v-if="row.modules.length>2">+{{row.modules.length-2}}</span></template></el-table-column>
+                        <el-table-column label="操作" width="180"><template #default="{row}"><el-button link type="primary" @click="openRuleDialog(row)">编辑</el-button><el-button link type="danger" @click="deleteRule(row)">删除</el-button></template></el-table-column>
+                    </el-table>
+                </div>
+                <!-- ========= 审批任务中心 ========= -->
+                <div v-if="activeMenu === 'taskCenter'">
+                    <div class="filter-bar"><el-radio-group v-model="taskView" size="small"><el-radio-button label="todo">待我审批</el-radio-button><el-radio-button label="done">我的已处理</el-radio-button></el-radio-group>
+                    <el-select v-model="taskFilter.module" placeholder="业务模块" clearable><el-option v-for="m in allModules" :key="m" :label="m" :value="m"></el-option></el-select>
+                    <el-button type="primary" @click="batchApprove" :disabled="selectedTasks.length===0" v-if="taskView==='todo'">批量通过</el-button><el-button type="danger" @click="batchReject" :disabled="selectedTasks.length===0" v-if="taskView==='todo'">批量拒绝</el-button></div>
+                    <el-table :data="filteredTasks" @selection-change="handleTaskSelection" row-key="id" stripe>
+                        <el-table-column type="selection" width="55" v-if="taskView==='todo'"></el-table-column>
+                        <el-table-column prop="id" label="任务ID" width="100"></el-table-column><el-table-column prop="module" label="业务模块"></el-table-column><el-table-column prop="operation" label="操作类型"></el-table-column>
+                        <el-table-column prop="applicant" label="申请人"></el-table-column><el-table-column prop="currentLevel" label="当前层级"></el-table-column>
+                        <el-table-column label="状态"><template #default="{row}"><el-tag :type="statusTag(row.status)">{{ statusText(row.status) }}</el-tag></template></el-table-column>
+                        <el-table-column prop="createTime" label="创建时间" width="160"></el-table-column>
+                        <el-table-column label="操作" width="180"><template #default="{row}"><el-button link type="primary" @click="viewTaskDetail(row)">详情</el-button><el-button link type="success" @click="openApproveDialog(row)" v-if="row.status==='pending' || row.status==='in_progress'">通过</el-button><el-button link type="danger" @click="openRejectDialog(row)" v-if="row.status==='pending' || row.status==='in_progress'">拒绝</el-button></template></el-table-column>
+                    </el-table>
+                </div>
+                <!-- ========= 我的申请 ========= -->
+                <div v-if="activeMenu === 'myApply'">
+                    <el-table :data="myApplications" stripe>
+                        <el-table-column prop="id" label="申请ID" width="100"></el-table-column><el-table-column prop="module" label="业务模块"></el-table-column><el-table-column prop="operation" label="操作类型"></el-table-column>
+                        <el-table-column label="状态"><template #default="{row}"><el-tag :type="statusTag(row.status)">{{ statusText(row.status) }}</el-tag></template></el-table-column>
+                        <el-table-column prop="currentNode" label="当前节点"></el-table-column><el-table-column prop="createTime" label="创建时间"></el-table-column>
+                        <el-table-column label="操作"><template #default="{row}"><el-button link type="primary" @click="viewApplyDetail(row)">详情</el-button><el-button link type="warning" @click="recallApply(row)" v-if="row.status==='pending' || row.status==='in_progress'">撤回</el-button></template></el-table-column>
+                    </el-table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 规则弹窗 (审批人类型仅支持指定用户) -->
+    <el-dialog v-model="ruleDialogVisible" :title="ruleForm.id ? '编辑规则' : '新增规则'" width="1000px" destroy-on-close>
+        <el-form :model="ruleForm" label-width="110px">
+            <el-form-item label="规则名称" required><el-input v-model="ruleForm.name"></el-input></el-form-item>
+            <el-form-item label="描述"><el-input v-model="ruleForm.description" type="textarea" rows="2"></el-input></el-form-item>
+            <el-form-item label="启用状态"><el-switch v-model="ruleForm.enabled"></el-switch></el-form-item>
+            <el-form-item label="优先级"><el-input-number v-model="ruleForm.priority" :min="1" :max="100"></el-input-number></el-form-item>
+            <el-form-item label="适用模块"><el-select v-model="ruleForm.modules" multiple filterable placeholder="选择模块" style="width:100%"><el-option v-for="mod in allModules" :key="mod" :label="mod" :value="mod"></el-option></el-select></el-form-item>
+            <el-form-item label="操作类型"><div style="border:1px solid #eee; border-radius:8px; padding:12px; width:100%"><div v-for="mod in ruleForm.modules" :key="mod" style="margin-bottom:12px"><strong>{{mod}}</strong> : <el-checkbox-group v-model="ruleForm.operations[mod]"><el-checkbox v-for="op in baseOperations" :label="op" :key="op">{{op}}</el-checkbox></el-checkbox-group></div></div></el-form-item>
+            <el-form-item label="审批流程(最多4级，仅支持指定用户)">
+                <div v-for="(level, idx) in ruleForm.approvalLevels" :key="idx" style="border:1px solid #eaeef2; border-radius:12px; padding:12px; margin-bottom:12px">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span>第{{idx+1}}级</span>
+                        <el-button link type="danger" @click="removeLevel(idx)" v-if="ruleForm.approvalLevels.length>1">删除</el-button>
+                    </div>
+                    <el-select v-model="level.mode" style="width:100px">
+                        <el-option label="或签" value="or"></el-option>
+                        <el-option label="会签" value="and"></el-option>
+                    </el-select>
+                    <span style="margin-left: 12px; color:#606266;">审批人(指定用户)：</span>
+                    <el-select v-model="level.approvers" multiple filterable placeholder="请选择审批人" style="width:300px; margin-left:8px">
+                        <el-option label="张三" value="张三"></el-option>
+                        <el-option label="李四" value="李四"></el-option>
+                        <el-option label="王五" value="王五"></el-option>
+                        <el-option label="赵六" value="赵六"></el-option>
+                        <el-option label="钱七" value="钱七"></el-option>
+                    </el-select>
+                </div>
+                <el-button type="primary" plain @click="addLevel" :disabled="ruleForm.approvalLevels.length>=4">+ 增加审批层级</el-button>
+            </el-form-item>
+            <el-form-item label="流程预览">
+                <div class="rule-preview-steps">
+                    <el-steps :active="0" finish-status="success" align-center>
+                        <el-step v-for="(lev, i) in ruleForm.approvalLevels" :key="i" :title="`第${i+1}级`" :description="`${lev.mode==='or'?'或签':'会签'} · ${lev.approvers.length ? lev.approvers.join(',') : '未选审批人'}`"></el-step>
+                    </el-steps>
+                </div>
+            </el-form-item>
+        </el-form>
+        <template #footer><el-button @click="ruleDialogVisible=false">取消</el-button><el-button type="primary" @click="saveRule">保存</el-button></template>
+    </el-dialog>
+
+    <!-- 审批详情 Drawer -->
+    <el-drawer v-model="detailDrawer" title="审批详情" size="60%" direction="rtl">
+        <div v-if="currentDetail">
+            <el-descriptions :column="2" border>
+                <el-descriptions-item label="审批ID">{{currentDetail.id}}</el-descriptions-item>
+                <el-descriptions-item label="状态"><el-tag :type="statusTag(currentDetail.status)">{{statusText(currentDetail.status)}}</el-tag></el-descriptions-item>
+                <el-descriptions-item label="当前层级">第{{currentDetail.currentLevel}}级 / 共{{currentDetail.totalLevels}}级</el-descriptions-item>
+                <el-descriptions-item label="创建时间">{{currentDetail.createTime}}</el-descriptions-item>
+            </el-descriptions>
+            <h4 style="margin-top:20px">变更内容 (Diff)</h4>
+            <div class="diff-json">{{ JSON.stringify({变更前: currentDetail.beforeData, 变更后: currentDetail.afterData}, null, 2) }}</div>
+            <h4 style="margin-top:20px">审批流程</h4>
+            <el-steps :active="Math.max(currentDetail.currentLevel - 1, 0)" finish-status="success" align-center>
+                <el-step
+                    v-for="level in currentDetail.approvalFlow"
+                    :key="level.level"
+                    :title="`第${level.level}级`"
+                    :description="levelStatusText(currentDetail.levelStatusMap[level.level] || 'pending')"
+                    :status="levelStepStatus(currentDetail.levelStatusMap[level.level] || 'pending')">
+                </el-step>
+            </el-steps>
+            <div style="margin-top:12px; color:#606266;">
+                当前处理层级：<strong>第{{currentDetail.currentLevel}}级</strong>
+                <span style="margin-left:12px;">当前待审批人：{{ currentDetail.currentApproverText || '-' }}</span>
+            </div>
+            <el-table :data="currentDetail.approvalFlow" size="small" style="margin-top:10px">
+                <el-table-column label="层级" width="90">
+                    <template #default="{row}">第{{row.level}}级</template>
+                </el-table-column>
+                <el-table-column label="状态" width="120">
+                    <template #default="{row}">
+                        <el-tag :type="levelTagType(currentDetail.levelStatusMap[row.level] || 'pending')">
+                            {{ levelStatusText(currentDetail.levelStatusMap[row.level] || 'pending') }}
+                        </el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column label="审批方式" width="100">
+                    <template #default="{row}">{{ row.mode==='and' ? '会签' : '或签' }}</template>
+                </el-table-column>
+                <el-table-column label="该层审批人">
+                    <template #default="{row}">{{ levelApproverText(row, currentDetail.approverNameMap) }}</template>
+                </el-table-column>
+            </el-table>
+            <h4 style="margin-top:20px">审批时间线</h4>
+            <div class="timeline-list"><div v-for="log in currentDetail.timeline" :key="log.time" class="timeline-item">[{{log.time}}] {{log.operatorName || log.operator}} {{log.action}} {{log.comment ? '· '+log.comment : ''}}</div></div>
+            <h4>审批记录</h4>
+            <el-table :data="currentDetail.records" size="small">
+                <el-table-column label="审批人"><template #default="{row}">{{row.approverName || row.approver || row.approverId}}</template></el-table-column>
+                <el-table-column label="结果"><template #default="{row}">{{row.action || row.result}}</template></el-table-column>
+                <el-table-column prop="opinion" label="意见"></el-table-column>
+                <el-table-column label="时间"><template #default="{row}">{{row.createTime || row.time}}</template></el-table-column>
+            </el-table>
+            <div v-if="currentDetail.status==='rejected' && currentDetail.showRollback" style="margin-top:20px"><el-button type="warning" @click="rollbackChange(currentDetail)">回滚变更</el-button></div>
+        </div>
+    </el-drawer>
+
+    <!-- 操作拦截弹窗 (规则匹配可视化) -->
+    <el-dialog v-model="triggerDialog.visible" title="操作拦截 · 需要审批" width="550px">
+        <div class="match-info">
+            <strong>✅ 命中审批规则 (最高优先级)</strong><br/>
+            规则名称：{{ triggerDialog.ruleName }}<br/>
+            优先级：{{ triggerDialog.priority }}<br/>
+            匹配依据：操作类型【{{ triggerDialog.operation }}】 + 资源【{{ triggerDialog.resource }}】
+        </div>
+        <p>该操作需要审批，是否提交审批单？</p>
+        <template #footer><el-button @click="triggerDialog.visible=false">取消</el-button><el-button type="primary" @click="confirmSubmitApproval">提交审批</el-button></template>
+    </el-dialog>
+
+    <!-- 审批意见弹窗 (必填) -->
+    <el-dialog v-model="opinionDialog.visible" :title="opinionDialog.title" width="450px">
+        <el-input type="textarea" v-model="opinionDialog.opinion" placeholder="请输入审批意见 (必填)" rows="3"></el-input>
+        <div style="margin-top:12px">
+            <el-button size="small" @click="opinionDialog.opinion='同意上线'">同意上线</el-button>
+            <el-button size="small" @click="opinionDialog.opinion='风险可控'">风险可控</el-button>
+            <el-button size="small" @click="opinionDialog.opinion='需要补充说明'">需补充</el-button>
+        </div>
+        <template #footer><el-button @click="opinionDialog.visible=false">取消</el-button><el-button type="primary" @click="executeOpinionAction" :disabled="!opinionDialog.opinion">确认</el-button></template>
+    </el-dialog>
+
+    <!-- 并发冲突提示 -->
+    <el-dialog v-model="conflictDialog.visible" title="并发冲突" width="450px"><p>{{ conflictDialog.message }}</p><template #footer><el-button @click="conflictDialog.visible=false">知道了</el-button></template></el-dialog>
+</div>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="https://unpkg.com/element-plus"></script>
+<script>
+    const { createApp, ref, computed, onMounted } = Vue;
+    createApp({
+        setup() {
+            const menus = [
+                { key: 'ruleManage', label: '审批规则管理', icon: 'el-icon-s-operation' },
+                { key: 'taskCenter', label: '审批任务中心', icon: 'el-icon-s-order' },
+                { key: 'myApply', label: '我的申请', icon: 'el-icon-user' }
+            ];
+            const activeMenu = ref('ruleManage');
+            const currentPageTitle = computed(() => menus.find(m => m.key === activeMenu.value)?.label || '');
+            const allModules = ["服务","API","证书","数据标签","脱敏算法","脱敏模板","脱敏规则","水印模板","水印规则","安全规则组","访问控制","白名单","AI合规策略"];
+            const baseOperations = ["新增","编辑","删除","启用","禁用"];
+            
+            // mock 规则
+            const rules = ref([]);
+            const ruleSearch = ref('');
+            const ruleDialogVisible = ref(false);
+            const ruleForm = ref({ 
+                name:'', description:'', enabled:true, priority:50, modules:[], 
+                operations:{}, 
+                approvalLevels:[{mode:'or', approverType:'user', approvers:['张三']}] 
+            });
+            let editId = null;
+
+            // 任务 & 申请
+            const tasks = ref([]);
+            const myApplications = ref([]);
+            const selectedTasks = ref([]);
+            const taskView = ref('todo');
+            const taskFilter = ref({ module:'' });
+            const pendingTaskCount = computed(() => tasks.value.filter(t => t.status === 'pending' || t.status === 'in_progress').length);
+            
+            // 详情抽屉
+            const detailDrawer = ref(false);
+            const currentDetail = ref(null);
+            // 弹窗
+            const triggerDialog = ref({ visible:false, operation:'', module:'', resource:'', ruleName:'', priority:0, pendingSubmitData:null });
+            const opinionDialog = ref({ visible:false, title:'', taskId:null, isApprove:true, opinion:'' });
+            const conflictDialog = ref({ visible:false, message:'' });
+            
+            // 辅助
+            const statusTag = (s) => ({ 
+                pending:'warning', in_progress:'warning', approved:'success', 
+                rejected:'danger', recalled:'info', timeout:'info' 
+            }[s] || 'info');
+            const statusText = (s) => ({ 
+                pending:'待审批', in_progress:'审批中', approved:'已通过', 
+                rejected:'已拒绝', recalled:'已撤回', timeout:'已超时' 
+            }[s] || s);
+            const levelStatusText = (s) => ({ done:'已完成', current:'进行中', pending:'未开始', rejected:'已拒绝' }[s] || s);
+            const levelStepStatus = (s) => ({ done:'success', current:'process', pending:'wait', rejected:'error' }[s] || 'wait');
+            const levelTagType = (s) => ({ done:'success', current:'warning', pending:'info', rejected:'danger' }[s] || 'info');
+            const levelApproverText = (level, approverNameMap) => {
+                const list = level?.approvers || [];
+                if(!list.length) return '-';
+                return list.map(id => approverNameMap?.[id] || id).join('、');
+            };
+            
+            const filteredRules = computed(() => rules.value.filter(r => r.name.includes(ruleSearch.value)));
+            const filteredTasks = computed(() => tasks.value.filter(t => {
+                const inView = taskView.value === 'todo'
+                    ? (t.status === 'pending' || t.status === 'in_progress')
+                    : (t.status === 'approved' || t.status === 'rejected' || t.status === 'recalled');
+                return inView && (!taskFilter.value.module || t.module === taskFilter.value.module);
+            }));
+            
+            // 规则匹配核心 (模块 + 操作类型)
+            const matchRule = (module, operation, resource) => {
+                const matched = rules.value.filter(r => 
+                    r.enabled && 
+                    r.modules.includes(module) && 
+                    r.operations[module]?.includes(operation)
+                );
+                if(matched.length === 0) return null;
+                matched.sort((a,b)=>b.priority - a.priority);
+                return matched[0];
+            };
+            
+            // 触发操作模拟
+            const simulateOperation = (module, operation, resourceName, before, after) => {
+                const hitRule = matchRule(module, operation, resourceName);
+                if(!hitRule) { 
+                    ElMessage.success(`✅ 操作执行成功: ${operation} ${resourceName} (未命中审批规则)`); 
+                    return true; 
+                }
+                // 并发检查: 同一资源是否有进行中审批
+                const existTask = tasks.value.find(t => t.resourceName === resourceName && t.module === module && (t.status === 'pending' || t.status === 'in_progress'));
+                if(existTask) { 
+                    conflictDialog.value = { visible:true, message:`该资源已有审批正在进行中（审批ID：${existTask.id}），请勿重复提交` }; 
+                    return false; 
+                }
+                triggerDialog.value = { 
+                    visible:true, operation, module, resource:resourceName, 
+                    ruleName:hitRule.name, priority:hitRule.priority, 
+                    pendingSubmitData:{ module, operation, resourceName, 
+                        before: before || {old:'原始配置'}, after: after || {new:'变更后配置'}, 
+                        rule:hitRule 
+                    } 
+                };
+                return false;
+            };
+            
+            const confirmSubmitApproval = () => {
+                const data = triggerDialog.value.pendingSubmitData;
+                if(!data) return;
+                const rule = data.rule;
+                const newTaskId = Date.now();
+                const levels = rule.approvalLevels.map((lev,idx) => ({ 
+                    ...lev, 
+                    status: idx===0 ? 'in_progress' : 'pending', 
+                    name:`第${idx+1}级`, 
+                    result: null 
+                }));
+                const newTask = { 
+                    id:newTaskId, module:data.module, operation:data.operation, 
+                    resourceName:data.resourceName, applicant:'当前用户(张工)', 
+                    currentLevel:'第1级', status:'pending', createTime:new Date().toLocaleString(), 
+                    approvalChain:levels, beforeData:data.before, afterData:data.after, 
+                    processStep:0, 
+                    timelineRecords:[{time:new Date().toLocaleTimeString(), operator:'张工', action:'提交申请', comment:''}], 
+                    approvalRecords:[]
+                };
+                tasks.value.unshift(newTask);
+                myApplications.value.unshift({ 
+                    id:newTaskId+1000, module:data.module, operation:data.operation, 
+                    resourceName:data.resourceName, status:'pending', currentNode:'一级审批', 
+                    createTime:new Date().toLocaleString(), taskId:newTask.id 
+                });
+                ElMessage.success(`已生成审批单【${newTask.id}】, 进入审批流程`);
+                triggerDialog.value.visible = false;
+            };
+            
+            // 审批操作
+            const openApproveDialog = (task) => { 
+                opinionDialog.value = { visible:true, title:'审批通过', taskId:task.id, isApprove:true, opinion:'同意上线' }; 
+            };
+            const openRejectDialog = (task) => { 
+                opinionDialog.value = { visible:true, title:'审批拒绝', taskId:task.id, isApprove:false, opinion:'不符合规范' }; 
+            };
+            
+            const executeOpinionAction = () => {
+                if(!opinionDialog.value.opinion) { 
+                    ElMessage.warning('请填写审批意见'); 
+                    return; 
+                }
+                const task = tasks.value.find(t => t.id === opinionDialog.value.taskId);
+                if(!task) return;
+                if(opinionDialog.value.isApprove) {
+                    task.status = 'approved';
+                    const apply = myApplications.value.find(a => a.taskId === task.id);
+                    if(apply) apply.status = 'approved';
+                    task.timelineRecords = task.timelineRecords || [];
+                    task.timelineRecords.push({time:new Date().toLocaleTimeString(), operator:'审批人', action:`审批通过`, comment:opinionDialog.value.opinion});
+                    task.approvalRecords = task.approvalRecords || [];
+                    task.approvalRecords.push({approver:'审批人', result:'通过', opinion:opinionDialog.value.opinion, time:new Date().toLocaleString()});
+                    ElMessage.success(`审批通过, 意见: ${opinionDialog.value.opinion}`);
+                } else {
+                    task.status = 'rejected';
+                    const apply = myApplications.value.find(a => a.taskId === task.id);
+                    if(apply) apply.status = 'rejected';
+                    task.timelineRecords = task.timelineRecords || [];
+                    task.timelineRecords.push({time:new Date().toLocaleTimeString(), operator:'审批人', action:`审批拒绝`, comment:opinionDialog.value.opinion});
+                    task.approvalRecords = task.approvalRecords || [];
+                    task.approvalRecords.push({approver:'审批人', result:'拒绝', opinion:opinionDialog.value.opinion, time:new Date().toLocaleString()});
+                    ElMessage.error(`审批拒绝, 意见: ${opinionDialog.value.opinion}`);
+                }
+                opinionDialog.value.visible = false;
+            };
+            
+            const batchApprove = () => { 
+                selectedTasks.value.forEach(t => { if(t.status==='pending'||t.status==='in_progress') openApproveDialog(t); }); 
+            };
+            const batchReject = () => { 
+                selectedTasks.value.forEach(t => { if(t.status==='pending'||t.status==='in_progress') openRejectDialog(t); }); 
+            };
+            const handleTaskSelection = (val) => { selectedTasks.value = val; };
+            
+            const viewTaskDetail = (task) => {
+                const levelNum = Number(String(task.currentLevel || '').replace(/[^\d]/g, '')) || 1;
+                const approvalFlow = (task.approvalFlow || (task.approvalChain || []).map((l, idx) => ({
+                    level: idx + 1,
+                    mode: l.mode || 'or',
+                    approvers: l.approvers || []
+                })));
+                const approverNameMap = task.approverNameMap || {};
+                const levelStatusMap = {};
+                approvalFlow.forEach(l => {
+                    if(task.status === 'approved') {
+                        levelStatusMap[l.level] = 'done';
+                    } else if(task.status === 'rejected') {
+                        levelStatusMap[l.level] = l.level < levelNum ? 'done' : (l.level === levelNum ? 'rejected' : 'pending');
+                    } else {
+                        levelStatusMap[l.level] = l.level < levelNum ? 'done' : (l.level === levelNum ? 'current' : 'pending');
+                    }
+                });
+                const currentLevelFlow = approvalFlow.find(l => l.level === levelNum);
+                const currentApproverText = (currentLevelFlow?.approvers || [])
+                    .map(id => approverNameMap[id] || id)
+                    .join('、');
+                currentDetail.value = { 
+                    id:task.id, status:task.status, currentLevel: levelNum,
+                    totalLevels: approvalFlow.length || 1,
+                    createTime:task.createTime, beforeData:task.beforeData, afterData:task.afterData, 
+                    approvalFlow, levelStatusMap, approverNameMap, currentApproverText,
+                    timeline:task.timelineRecords || [{time:task.createTime,operator:task.applicant,action:'提交申请',comment:''}], 
+                    records:task.approvalRecords || [], showRollback:task.status==='rejected' 
+                };
+                detailDrawer.value = true;
+            };
+            
+            const viewApplyDetail = (apply) => { 
+                const t = tasks.value.find(ts=>ts.id===apply.taskId); 
+                if(t) viewTaskDetail(t); 
+            };
+            
+            const recallApply = (apply) => {
+                if(apply.status !== 'pending' && apply.status !== 'in_progress') { 
+                    ElMessage.warning('不可撤回'); 
+                    return; 
+                }
+                const task = tasks.value.find(t=>t.id===apply.taskId);
+                if(task) { 
+                    task.status = 'recalled'; 
+                    apply.status = 'recalled'; 
+                    ElMessage.success('已撤回申请，流程终止'); 
+                }
+            };
+            
+            const rollbackChange = (detail) => { 
+                ElMessage.success('已执行回滚，恢复变更前状态'); 
+                detail.showRollback = false; 
+            };
+            
+            // 规则管理
+            const openRuleDialog = (row) => {
+                if(row) { 
+                    editId = row.id; 
+                    ruleForm.value = JSON.parse(JSON.stringify(row)); 
+                } else { 
+                    editId = null; 
+                    ruleForm.value = { 
+                        name:'', description:'', enabled:true, priority:50, modules:[], 
+                        operations:{}, 
+                        approvalLevels:[{mode:'or', approverType:'user', approvers:['张三']}] 
+                    }; 
+                }
+                ruleDialogVisible.value = true;
+            };
+            
+            const saveRule = () => {
+                if(!ruleForm.value.name) return ElMessage.warning('规则名称必填');
+                // 校验每一级审批人不能为空
+                for(let i=0; i<ruleForm.value.approvalLevels.length; i++) {
+                    if(!ruleForm.value.approvalLevels[i].approvers || ruleForm.value.approvalLevels[i].approvers.length === 0) {
+                        ElMessage.warning(`第${i+1}级审批人不能为空，请选择审批人`);
+                        return;
+                    }
+                }
+                const newRule = { ...ruleForm.value, id: editId || Date.now() };
+                if(editId) { 
+                    const idx = rules.value.findIndex(r => r.id === editId); 
+                    rules.value[idx] = newRule; 
+                } else { 
+                    rules.value.unshift(newRule); 
+                }
+                ruleDialogVisible.value = false; 
+                ElMessage.success('保存成功');
+            };
+            
+            const deleteRule = (row) => { 
+                rules.value = rules.value.filter(r => r.id !== row.id); 
+            };
+            const updateRule = () => {};
+            const addLevel = () => { 
+                if(ruleForm.value.approvalLevels.length<4) 
+                    ruleForm.value.approvalLevels.push({mode:'or', approverType:'user', approvers:['张三']}); 
+            };
+            const removeLevel = (idx) => { 
+                ruleForm.value.approvalLevels.splice(idx,1); 
+            };
+            
+            // 初始化 mock
+            const initMock = () => {
+                rules.value = [ 
+                    { id:1, name:'生产高危API删除规则', description:'生产环境API删除需审批', enabled:true, priority:95, 
+                      modules:['API'], operations:{'API':['删除']}, 
+                      approvalLevels:[{mode:'or', approverType:'user', approvers:['张三']},{mode:'and', approverType:'user', approvers:['李四']}] },
+                    { id:2, name:'核心服务禁用规则', description:'服务禁用必须审批', enabled:true, priority:88, 
+                      modules:['服务'], operations:{'服务':['禁用']}, 
+                      approvalLevels:[{mode:'or', approverType:'user', approvers:['王五']}] }
+                ];
+                tasks.value = [ 
+                    { id:1000, module:'证书', operation:'新增', resourceName:'cert-001', applicant:'林工', 
+                      currentLevel:'第1级', status:'in_progress', createTime:'2025-02-18 07:40', 
+                      beforeData:{count:10}, afterData:{count:11}, 
+                      approvalFlow:[
+                        {level:1, mode:'or', approvers:['u5001']}
+                      ],
+                      approverNameMap:{u5001:'高主管'},
+                      timelineRecords:[{time:'07:40',operator:'林工',operatorName:'林工',action:'提交申请',comment:''}], 
+                      approvalRecords:[] },
+                    { id:1001, module:'API', operation:'删除', resourceName:'/api/delete-sensitive', applicant:'王小明', 
+                      currentLevel:'第1级', status:'pending', createTime:'2025-02-18 09:30', 
+                      beforeData:{version:'v1'}, afterData:{deleted:true}, 
+                      approvalFlow:[
+                        {level:1, mode:'or', approvers:['u1001','u1002']},
+                        {level:2, mode:'and', approvers:['u2001']}
+                      ],
+                      approverNameMap:{u1001:'张三', u1002:'李四', u2001:'王五'},
+                      timelineRecords:[{time:'09:30',operator:'王小明',operatorName:'王小明',action:'提交申请',comment:''}], 
+                      approvalRecords:[] },
+                    { id:1002, module:'服务', operation:'禁用', resourceName:'user-center', applicant:'赵主管', 
+                      currentLevel:'第2级', status:'approved', createTime:'2025-02-18 08:10', 
+                      beforeData:{status:'enabled'}, afterData:{status:'disabled'}, 
+                      approvalFlow:[
+                        {level:1, mode:'or', approvers:['u3001']},
+                        {level:2, mode:'or', approvers:['u3002']}
+                      ],
+                      approverNameMap:{u3001:'陈经理', u3002:'刘总监'},
+                      timelineRecords:[
+                        {time:'08:10',operator:'赵主管',operatorName:'赵主管',action:'提交申请',comment:''},
+                        {time:'08:20',operator:'u3001',operatorName:'陈经理',action:'approve',comment:'同意'},
+                        {time:'08:35',operator:'u3002',operatorName:'刘总监',action:'approve',comment:'通过'}
+                      ], 
+                      approvalRecords:[
+                        {approverId:'u3001', approverName:'陈经理', action:'approve', opinion:'同意', createTime:'08:20'},
+                        {approverId:'u3002', approverName:'刘总监', action:'approve', opinion:'通过', createTime:'08:35'}
+                      ] },
+                    { id:1003, module:'API', operation:'编辑', resourceName:'/api/user/update', applicant:'孙工', 
+                      currentLevel:'第2级', status:'in_progress', createTime:'2025-02-18 11:00', 
+                      beforeData:{timeout:30}, afterData:{timeout:60}, 
+                      approvalFlow:[
+                        {level:1, mode:'or', approvers:['u4001']},
+                        {level:2, mode:'and', approvers:['u4002','u4003']},
+                        {level:3, mode:'or', approvers:['u4004']}
+                      ],
+                      approverNameMap:{u4001:'周经理', u4002:'吴主管', u4003:'郑主管', u4004:'王总监'},
+                      timelineRecords:[
+                        {time:'11:00',operator:'孙工',operatorName:'孙工',action:'提交申请',comment:''},
+                        {time:'11:10',operator:'u4001',operatorName:'周经理',action:'approve',comment:'同意进入二级审批'}
+                      ], 
+                      approvalRecords:[
+                        {approverId:'u4001', approverName:'周经理', action:'approve', opinion:'同意进入二级审批', createTime:'11:10'}
+                      ] } 
+                ];
+                myApplications.value = [ 
+                    { id:2000, module:'证书', operation:'新增', resourceName:'cert-001', 
+                      status:'in_progress', currentNode:'一级审批', createTime:'2025-02-18 07:40', taskId:1000 },
+                    { id:2001, module:'API', operation:'删除', resourceName:'/api/delete-sensitive', 
+                      status:'pending', currentNode:'一级审批', createTime:'2025-02-18 09:30', taskId:1001 },
+                    { id:2002, module:'服务', operation:'禁用', resourceName:'user-center',
+                      status:'approved', currentNode:'已完成', createTime:'2025-02-18 08:10', taskId:1002 },
+                    { id:2003, module:'API', operation:'编辑', resourceName:'/api/user/update',
+                      status:'in_progress', currentNode:'二级审批', createTime:'2025-02-18 11:00', taskId:1003 } 
+                ];
+            };
+            
+            onMounted(()=>{ initMock(); window.simulateOperation = simulateOperation; });
+            
+            return { 
+                menus, activeMenu, currentPageTitle, allModules, baseOperations, 
+                rules, ruleSearch, filteredRules, ruleDialogVisible, ruleForm, 
+                openRuleDialog, saveRule, deleteRule, updateRule, addLevel, removeLevel, 
+                tasks, taskView, taskFilter, filteredTasks, selectedTasks, pendingTaskCount, myApplications, 
+                batchApprove, batchReject, handleTaskSelection, 
+                openApproveDialog, openRejectDialog, viewTaskDetail, viewApplyDetail, recallApply, 
+                detailDrawer, currentDetail, triggerDialog, opinionDialog, conflictDialog, 
+                confirmSubmitApproval, executeOpinionAction, rollbackChange, 
+                statusTag, statusText, 
+                simulateOperation, levelStatusText, levelStepStatus, levelTagType, levelApproverText
+            };
+        }
+    }).use(ElementPlus).mount('#app');
+</script>
+</body>
+</html>

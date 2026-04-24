@@ -1,0 +1,4 @@
+[submodule "sub-apps/das-ued-skills"]
+	path = sub-apps/das-ued-skills
+	url = http://gitlab.info.dbappsecurity.com.cn/ued6/das-ued-skills.git
+	ignore = dirty 

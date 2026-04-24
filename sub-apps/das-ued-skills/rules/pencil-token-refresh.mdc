@@ -1,0 +1,83 @@
+---
+description: Pencil 设计阶段 Token 注入与批量刷新规则。在任何涉及 .pen 文件的设计工作中，优先从 project_description.md 的 Pencil Token Values 节读取 hex 值并全量注入；在用户说"刷新设计系统"时执行选择性批量刷新。此规则优先于任何 Skill 文件中的 Q2 注入描述，在 Skill 文件被整体替换后依然有效。
+globs:
+  - "*.pen"
+alwaysApply: false
+---
+
+# Pencil Token 注入与批量刷新规则
+
+## 规则 A — Q2 注入锚点
+
+**触发时机**：每次 `open_document()` 打开 `.pen` 文件后，开始设计工作前。
+
+**执行步骤**：
+
+1. 用 Read 工具读取工作区根目录的 `project_description.md`
+2. 检查是否存在 `## Pencil Token Values` 节
+3. **格式预检（阻断）**：找到该节后，验证其中是否存在以 `| Pencil Variable | 值 |` 为列头的注入表
+   - **表头正确（含 `Pencil Variable` 与 `值` 两列）** → 继续步骤 4
+   - **表头不正确（如 `| 用途 | Hex |` 等语义描述表）** → **停止注入**，提示用户：
+     > "`project_description.md` 的 Pencil Token Values 节格式不符：需要 `| Pencil Variable | 值 |` 列头的注入表（不是「用途 | Hex」描述表）。请参考模板补充后再继续设计。"
+   - **节不存在** → 回退到 Skill 文件中的 Q2 默认注入（仅 5 个变量），并提示用户：`project_description.md` 缺少 Pencil Token Values 节，建议补充。
+4. **存在且格式正确** → 解析全部 `| Pencil Variable | 值 |` 行，调用 `set_variables()` 一次性全量写入
+   - 不要只注入前 5 个变量，必须写入表格中**全部条目**（数量以 `project_description.md` 为准）
+   - 通常包含：品牌色、状态色（含浅色）、风险色（含浅色）、圆角等
+5. **注入后验证**：调用 `get_variables()` 确认圆角变量（`radius/3xs`、`radius/xs`、`radius/lg`）已写入；缺失则重新执行 `set_variables`
+
+> 此规则优先级高于 `b-admin-pencil-design` Skill 的 Q2 注入描述。Skill 文件被整体替换后，本规则仍然有效。
+
+---
+
+## 规则 B — 选择性批量刷新
+
+**触发词**（用户说以下任意一句时执行）：
+- "刷新设计系统"
+- "同步 Token"
+- "应用项目色"
+- "refresh tokens"
+- "刷新所有设计文件"
+
+**执行流程**：
+
+```
+Step 1：扫描设计副本
+  Shell: ls *.pen 2>/dev/null（在项目工作区根目录执行）
+  排除文件名含 "[组件库]" 的文件
+  若无可刷新文件 → 提示"当前目录下没有检测到设计副本 .pen 文件"，停止
+
+Step 2：用户选择
+  调用 AskQuestion（allow_multiple: true）
+  prompt: "检测到以下设计副本，请勾选需要刷新 Token 的文件"
+  options: 每个 .pen 文件对应一个 option（id = 文件名，label = 文件名）
+  若用户取消或不勾选 → 停止，不执行刷新
+
+Step 3：逐文件刷新（按用户勾选顺序）
+  对每个勾选的文件：
+    open_document(文件路径)
+    get_variables()   ← 可选：与 project_description.md 对比，日志记录差异
+    读取 project_description.md 的 Pencil Token Values 表格
+    set_variables() 写入全部变量
+    记录结果（成功 / 失败）
+
+Step 4：输出完成报告
+  格式：
+    已刷新 N 个文件：
+    ✅ 文件名1.pen
+    ✅ 文件名2.pen
+    （若有失败）❌ 文件名3.pen — 原因
+```
+
+---
+
+## Token 值来源
+
+始终从 `project_description.md` 的 `## Pencil Token Values` 节读取，不要使用硬编码值。若该节不存在，停止并提示用户先运行 `teach-project_description` 或手动补充该节。
+
+### 注入表新鲜度检查（开始设计前执行一次）
+
+注入表中 `来源` 列标注 **"项目覆盖"** 的行，其值来自项目的 `foundation.skills.md`（或等效的设计规范文件），不是全局 b-admin-pencil-design 默认值。若注入表缺少 `来源` 列，或所有行值与全局默认完全一致，则注入表可能尚未应用项目覆盖，应警告用户：
+
+> ⚠️ 注入表可能使用了全局默认值，未反映本项目的覆盖值。建议对照 `foundation.skills.md`（或项目设计规范）手动核查"项目覆盖"行，或说"刷新设计系统"重新生成注入表。
+
+**如何确认项目覆盖值**：从当前工作区的 `project_description.md` 的 `## Pencil Token Values` 节获取，该节中 `来源` 列标注"项目覆盖"的行即为期望值。
