@@ -222,9 +222,8 @@ export default function MyApplications() {
 
   return (
     <div className="my-applications-page">
-      <Card
-        title="我的申请"
-        extra={
+      <Card>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
           <Space>
             <Select
               placeholder="审批状态"
@@ -241,8 +240,7 @@ export default function MyApplications() {
               options={MODULE_LIST.map(m => ({ label: m.name, value: m.code }))}
             />
           </Space>
-        }
-      >
+        </div>
         <Table
           rowKey="taskId"
           columns={columns}

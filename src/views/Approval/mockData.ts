@@ -33,7 +33,7 @@ export const userNameMap: Record<string, string> = MOCK_USERS.reduce(
 
 // ========== 审批规则 Mock ==========
 
-export const MOCK_RULES: ApprovalRule[] = [
+export let MOCK_RULES: ApprovalRule[] = [
   {
     id: 1,
     ruleName: '生产高危API删除规则',
@@ -98,7 +98,7 @@ export const MOCK_RULES: ApprovalRule[] = [
 
 // ========== 审批任务 Mock（待我审批） ==========
 
-export const MOCK_TASKS_TODO: ApprovalTaskListItem[] = [
+export let MOCK_TASKS_TODO: ApprovalTaskListItem[] = [
   {
     id: 1000,
     moduleCode: 'certificate',
@@ -189,7 +189,7 @@ export const MOCK_TASKS_TODO: ApprovalTaskListItem[] = [
 
 // ========== 审批任务 Mock（我的已处理） ==========
 
-export const MOCK_TASKS_DONE: ApprovalTaskListItem[] = [
+export let MOCK_TASKS_DONE: ApprovalTaskListItem[] = [
   {
     id: 2000,
     moduleCode: 'service',
@@ -226,7 +226,7 @@ export const MOCK_TASKS_DONE: ApprovalTaskListItem[] = [
 
 // ========== 我的申请 Mock ==========
 
-export const MOCK_MY_APPLICATIONS: MyApplication[] = [
+export let MOCK_MY_APPLICATIONS: MyApplication[] = [
   {
     taskId: 1000,
     moduleCode: 'certificate',
@@ -276,7 +276,7 @@ export const MOCK_MY_APPLICATIONS: MyApplication[] = [
 
 // ========== 任务详情 Mock ==========
 
-export const MOCK_TASK_DETAIL: TaskDetailResponse = {
+export let MOCK_TASK_DETAIL: TaskDetailResponse = {
   id: 1001,
   moduleCode: 'api',
   moduleName: 'API',
@@ -313,3 +313,123 @@ export const MOCK_TASK_DETAIL: TaskDetailResponse = {
   records: [],
   currentApproverNames: ['张三', '李四'],
 };
+
+// ========== Mock 数据池变更操作 ==========
+
+/**
+ * 检查是否与当前层级审批人匹配（模拟当前用户为所有审批人）
+ */
+export function isCurrentApprover(/* _task: ApprovalTask */): boolean {
+  return true; // Demo 模式下当前用户对所有待审批任务都有权限
+}
+
+/**
+ * 审批任务通过 - 更新数据池
+ */
+export function approveMockTask(taskId: number): void {
+  const idx = MOCK_TASKS_TODO.findIndex(t => t.id === taskId);
+  if (idx !== -1) {
+    const task = MOCK_TASKS_TODO[idx];
+    task.status = 'approved';
+    task.executionStatus = 'success';
+    task.updateTime = Date.now();
+    // 移除并添加到已处理
+    MOCK_TASKS_TODO.splice(idx, 1);
+    MOCK_TASKS_DONE.push(task);
+  }
+  // 同步更新我的申请
+  updateApplicationStatus(taskId, 'approved');
+}
+
+/**
+ * 审批任务拒绝 - 更新数据池
+ */
+export function rejectMockTask(taskId: number): void {
+  const idx = MOCK_TASKS_TODO.findIndex(t => t.id === taskId);
+  if (idx !== -1) {
+    const task = MOCK_TASKS_TODO[idx];
+    task.status = 'rejected';
+    task.updateTime = Date.now();
+    MOCK_TASKS_TODO.splice(idx, 1);
+    MOCK_TASKS_DONE.push(task);
+  }
+  updateApplicationStatus(taskId, 'rejected');
+}
+
+/**
+ * 同步更新我的申请状态
+ */
+function updateApplicationStatus(taskId: number, status: MyApplication['status']): void {
+  const app = MOCK_MY_APPLICATIONS.find(a => a.taskId === taskId);
+  if (app) {
+    app.status = status;
+    app.updateTime = Date.now();
+  }
+}
+
+/**
+ * 模拟撤回申请 - 更新数据池
+ */
+export function recallMockApplication(taskId: number): void {
+  const app = MOCK_MY_APPLICATIONS.find(a => a.taskId === taskId);
+  if (app) {
+    app.status = 'recalled';
+    app.updateTime = Date.now();
+  }
+  // 同步更新任务状态
+  const todoIdx = MOCK_TASKS_TODO.findIndex(t => t.id === taskId);
+  if (todoIdx !== -1) {
+    MOCK_TASKS_TODO[todoIdx].status = 'recalled';
+    MOCK_TASKS_TODO.splice(todoIdx, 1);
+  }
+}
+
+/**
+ * 新增规则 - 更新数据池
+ */
+export function addMockRule(data: { ruleName: string; ruleDesc?: string; enabled?: boolean; priority?: number; scopeJson: Record<string, string[]>; approvalFlow: { level: number; mode: 'or' | 'and'; approvers: string[] }[] }): { id: number } {
+  const maxId = Math.max(...MOCK_RULES.map(r => r.id), 0);
+  const newRule: ApprovalRule = {
+    id: maxId + 1,
+    ruleName: data.ruleName,
+    ruleDesc: data.ruleDesc,
+    enabled: data.enabled ?? true,
+    priority: data.priority ?? 50,
+    scopeJson: data.scopeJson,
+    approvalFlow: data.approvalFlow,
+    createTime: Date.now(),
+  };
+  MOCK_RULES.push(newRule);
+  return { id: newRule.id };
+}
+
+/**
+ * 更新规则 - 更新数据池
+ */
+export function updateMockRule(id: number, data: { ruleName?: string; ruleDesc?: string; enabled?: boolean; priority?: number; scopeJson?: Record<string, string[]>; approvalFlow?: { level: number; mode: 'or' | 'and'; approvers: string[] }[] }): void {
+  const rule = MOCK_RULES.find(r => r.id === id);
+  if (rule) {
+    Object.assign(rule, data, { updateTime: Date.now() });
+  }
+}
+
+/**
+ * 删除规则 - 更新数据池
+ */
+export function deleteMockRule(id: number): void {
+  const idx = MOCK_RULES.findIndex(r => r.id === id);
+  if (idx !== -1) {
+    MOCK_RULES.splice(idx, 1);
+  }
+}
+
+/**
+ * 启用/禁用规则 - 更新数据池
+ */
+export function toggleMockRule(id: number, enabled: boolean): void {
+  const rule = MOCK_RULES.find(r => r.id === id);
+  if (rule) {
+    rule.enabled = enabled;
+    rule.updateTime = Date.now();
+  }
+}

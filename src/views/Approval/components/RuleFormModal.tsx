@@ -19,18 +19,17 @@ import {
   Space,
   message,
   Divider,
-  Alert,
-  Checkbox,
   Tooltip,
 } from 'antd';
 import {
   PlusOutlined,
   DeleteOutlined,
+  InfoCircleOutlined,
 } from '@ant-design/icons';
 import type { ApprovalRule, ApprovalRuleForm, UserItem, ApprovalFlow } from '../types';
-import { MODULE_LIST } from '../constants';
 import { createApprovalRule, updateApprovalRule } from '../services';
 import ApprovalFlowChart from './ApprovalFlowChart';
+import ModuleScopeSelector from './ModuleScopeSelector';
 
 const { TextArea } = Input;
 
@@ -54,14 +53,11 @@ export default function RuleFormModal({
   const [approvalFlow, setApprovalFlow] = useState<ApprovalFlow[]>([
     { level: 1, mode: 'or', approvers: [] },
   ]);
-  // 已选模块列表（受控）
-  const [selectedModules, setSelectedModules] = useState<string[]>([]);
 
   // 初始化
   useEffect(() => {
     if (visible) {
       if (editingRule) {
-        const scopeKeys = Object.keys(editingRule.scopeJson || {});
         form.setFieldsValue({
           ruleName: editingRule.ruleName,
           ruleDesc: editingRule.ruleDesc,
@@ -69,7 +65,6 @@ export default function RuleFormModal({
           priority: editingRule.priority,
           scopeJson: editingRule.scopeJson,
         });
-        setSelectedModules(scopeKeys);
         setApprovalFlow(editingRule.approvalFlow);
       } else {
         form.resetFields();
@@ -78,7 +73,6 @@ export default function RuleFormModal({
           priority: 50,
           scopeJson: {},
         });
-        setSelectedModules([]);
         setApprovalFlow([{ level: 1, mode: 'or', approvers: [] }]);
       }
     }
@@ -217,91 +211,23 @@ export default function RuleFormModal({
           <InputNumber min={1} max={100} style={{ width: 120 }} />
         </Form.Item>
 
-        <Divider orientation="left">适用模块与操作</Divider>
-        
-        <Alert
-          message="选择该规则生效的模块和操作类型"
-          type="info"
-          showIcon
-          style={{ marginBottom: 16 }}
-        />
+        <Divider orientation="left">
+          适用模块与操作
+          <Tooltip title="选择该规则生效的模块和操作类型">
+            <InfoCircleOutlined style={{ marginLeft: 8, color: '#999', cursor: 'help' }} />
+          </Tooltip>
+        </Divider>
 
-        <Form.Item label="适用模块">
-          <Checkbox.Group
-            value={selectedModules}
-            onChange={(checkedValues) => {
-              const newModules = checkedValues as string[];
-              setSelectedModules(newModules);
-              // 清理取消勾选模块的 scopeJson 数据
-              const currentScope = form.getFieldValue('scopeJson') || {};
-              const newScope: Record<string, string[]> = {};
-              newModules.forEach(key => {
-                newScope[key] = currentScope[key] || [];
-              });
-              form.setFieldsValue({ scopeJson: newScope });
-            }}
-            style={{ width: '100%' }}
-          >
-            <Space wrap size={[8, 12]}>
-              {MODULE_LIST.map((module) => (
-                <Tooltip key={module.code} title={module.tooltip}>
-                  <Checkbox value={module.code}>{module.name}</Checkbox>
-                </Tooltip>
-              ))}
-            </Space>
-          </Checkbox.Group>
+        <Form.Item label="适用模块" name="scopeJson">
+          <ModuleScopeSelector />
         </Form.Item>
 
-        {selectedModules.length > 0 && (
-          <div style={{ marginTop: 8, marginBottom: 16 }}>
-            {selectedModules.map((moduleCode) => {
-              const moduleDef = MODULE_LIST.find(m => m.code === moduleCode);
-              if (!moduleDef) return null;
-              return (
-                <div
-                  key={moduleCode}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    marginBottom: 8,
-                    padding: '8px 12px',
-                    background: '#fafbfc',
-                    borderRadius: 6,
-                    border: '1px solid #f0f0f0',
-                  }}
-                >
-                  <span style={{ width: 100, flexShrink: 0, fontWeight: 500 }}>
-                    {moduleDef.name}
-                  </span>
-                  <Form.Item
-                    name={['scopeJson', moduleCode]}
-                    noStyle
-                  >
-                    <Select
-                      mode="multiple"
-                      placeholder={`选择${moduleDef.name}需审批的操作类型`}
-                      style={{ flex: 1 }}
-                      allowClear
-                      options={moduleDef.operations.map((op) => ({
-                        label: op,
-                        value: op,
-                      }))}
-                    />
-                  </Form.Item>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        <Divider orientation="left">审批流程</Divider>
-
-        <Alert
-          message="最多支持4级审批层级，支持或签（任一审批人通过即可）和会签（全部审批人通过）"
-          type="info"
-          showIcon
-          style={{ marginBottom: 16 }}
-        />
+        <Divider orientation="left">
+          审批流程
+          <Tooltip title="最多支持4级审批层级，支持或签（任一审批人通过即可）和会签（全部审批人通过）">
+            <InfoCircleOutlined style={{ marginLeft: 8, color: '#999', cursor: 'help' }} />
+          </Tooltip>
+        </Divider>
 
         {approvalFlow.map((level, index) => (
           <div

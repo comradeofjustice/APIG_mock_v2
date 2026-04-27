@@ -270,28 +270,23 @@ export default function ApprovalRuleManage() {
 
   return (
     <div className="approval-rule-manage-page">
-      <Card
-        title="审批规则管理"
-        extra={
-          <Space>
-            <Search
-              placeholder="搜索规则名称"
-              allowClear
-              style={{ width: 240 }}
-              onSearch={handleSearch}
-              prefix={<SearchOutlined />}
-            />
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleAdd}
-            >
-              新增规则
-            </Button>
-          </Space>
-        }
-        style={{ padding: 0 }}
-      >
+      <Card style={{ padding: 0 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={handleAdd}
+          >
+            新增规则
+          </Button>
+          <Search
+            placeholder="搜索规则名称"
+            allowClear
+            style={{ width: 240 }}
+            onSearch={handleSearch}
+            prefix={<SearchOutlined />}
+          />
+        </div>
         <Table
           rowKey="id"
           columns={columns}

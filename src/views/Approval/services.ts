@@ -1,7 +1,7 @@
 /**
- * 审批与规则控制 - API 服务
+ * 审批与规则控制 - Mock API 服务
  * 
- * TODO: 替换为真实后端 API 调用
+ * 所有接口使用 Mock 数据模拟，包含完整的数据流转
  */
 
 import type {
@@ -26,6 +26,13 @@ import {
   MOCK_MY_APPLICATIONS,
   MOCK_TASK_DETAIL,
   MOCK_USERS,
+  addMockRule,
+  updateMockRule,
+  deleteMockRule,
+  toggleMockRule,
+  approveMockTask,
+  rejectMockTask,
+  recallMockApplication,
 } from './mockData';
 
 // 模拟延迟
@@ -39,7 +46,6 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 export async function queryApprovalRules(
   params: ApprovalRuleQuery
 ): Promise<PageResponse<ApprovalRule>> {
-  // TODO: 替换为真实 API
   await delay(300);
   
   const { nameKeyword, currentPage, pageSize } = params;
@@ -66,42 +72,40 @@ export async function queryApprovalRules(
  * 新增审批规则
  */
 export async function createApprovalRule(
-  _data: ApprovalRuleForm
+  data: ApprovalRuleForm
 ): Promise<{ id: number }> {
-  // TODO: 替换为真实 API
   await delay(500);
-  
-  return { id: Date.now() };
+  return addMockRule(data);
 }
 
 /**
  * 更新审批规则
  */
 export async function updateApprovalRule(
-  _id: number,
-  _data: ApprovalRuleForm
+  id: number,
+  data: ApprovalRuleForm
 ): Promise<void> {
-  // TODO: 替换为真实 API
   await delay(500);
+  updateMockRule(id, data);
 }
 
 /**
  * 删除审批规则
  */
-export async function deleteApprovalRule(_id: number): Promise<void> {
-  // TODO: 替换为真实 API
+export async function deleteApprovalRule(id: number): Promise<void> {
   await delay(300);
+  deleteMockRule(id);
 }
 
 /**
  * 启用/禁用审批规则
  */
 export async function toggleApprovalRule(
-  _id: number,
-  _enabled: boolean
+  id: number,
+  enabled: boolean
 ): Promise<void> {
-  // TODO: 替换为真实 API
   await delay(300);
+  toggleMockRule(id, enabled);
 }
 
 // ========== 审批任务 API ==========
@@ -112,7 +116,6 @@ export async function toggleApprovalRule(
 export async function queryApprovalTasks(
   params: ApprovalTaskQuery
 ): Promise<PageResponse<ApprovalTaskListItem>> {
-  // TODO: 替换为真实 API
   await delay(300);
   
   const { tabKey, moduleCode, currentPage, pageSize } = params;
@@ -138,7 +141,6 @@ export async function queryApprovalTasks(
  * 获取待审批任务数量
  */
 export async function getPendingTaskCount(): Promise<number> {
-  // TODO: 替换为真实 API
   await delay(200);
   
   return MOCK_TASKS_TODO.length;
@@ -150,7 +152,6 @@ export async function getPendingTaskCount(): Promise<number> {
 export async function getTaskDetail(
   taskId: number
 ): Promise<TaskDetailResponse> {
-  // TODO: 替换为真实 API
   await delay(300);
   
   return { ...MOCK_TASK_DETAIL, id: taskId };
@@ -160,42 +161,42 @@ export async function getTaskDetail(
  * 审批通过
  */
 export async function approveTask(
-  _taskId: number,
+  taskId: number,
   _data: ApprovalActionRequest
 ): Promise<void> {
-  // TODO: 替换为真实 API
   await delay(500);
+  approveMockTask(taskId);
 }
 
 /**
  * 审批拒绝
  */
 export async function rejectTask(
-  _taskId: number,
+  taskId: number,
   _data: ApprovalActionRequest
 ): Promise<void> {
-  // TODO: 替换为真实 API
   await delay(500);
+  rejectMockTask(taskId);
 }
 
 /**
  * 批量通过
  */
 export async function batchApproveTasks(
-  _data: BatchApprovalRequest
+  data: BatchApprovalRequest
 ): Promise<void> {
-  // TODO: 替换为真实 API
   await delay(800);
+  data.taskIds.forEach(id => approveMockTask(id));
 }
 
 /**
  * 批量拒绝
  */
 export async function batchRejectTasks(
-  _data: BatchApprovalRequest
+  data: BatchApprovalRequest
 ): Promise<void> {
-  // TODO: 替换为真实 API
   await delay(800);
+  data.taskIds.forEach(id => rejectMockTask(id));
 }
 
 // ========== 我的申请 API ==========
@@ -206,7 +207,6 @@ export async function batchRejectTasks(
 export async function queryMyApplications(
   params: MyApplicationQuery
 ): Promise<PageResponse<MyApplication>> {
-  // TODO: 替换为真实 API
   await delay(300);
   
   const { status, moduleCode, currentPage, pageSize } = params;
@@ -234,9 +234,9 @@ export async function queryMyApplications(
 /**
  * 撤回申请
  */
-export async function recallMyApplication(_taskId: number): Promise<void> {
-  // TODO: 替换为真实 API
+export async function recallMyApplication(taskId: number): Promise<void> {
   await delay(500);
+  recallMockApplication(taskId);
 }
 
 // ========== 辅助 API ==========
@@ -245,7 +245,6 @@ export async function recallMyApplication(_taskId: number): Promise<void> {
  * 获取用户字典
  */
 export async function getUserList(): Promise<UserItem[]> {
-  // TODO: 替换为真实 API
   await delay(200);
   
   return MOCK_USERS;

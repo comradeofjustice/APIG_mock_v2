@@ -291,7 +291,7 @@ export default function ApprovalTaskCenter() {
 
   return (
     <div className="approval-task-center-page">
-      <Card title="审批任务中心">
+      <Card>
         <Tabs
           activeKey={activeTab}
           onChange={handleTabChange}
@@ -300,7 +300,27 @@ export default function ApprovalTaskCenter() {
           <Tabs.TabPane tab="我的已处理" key="done" />
         </Tabs>
 
-        <Space style={{ marginBottom: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <Space>
+            {activeTab === 'todo' && (
+              <>
+                <Button
+                  type="primary"
+                  onClick={() => handleOpenOpinion('approve')}
+                  disabled={selectedRowKeys.length === 0}
+                >
+                  批量通过
+                </Button>
+                <Button
+                  danger
+                  onClick={() => handleOpenOpinion('reject')}
+                  disabled={selectedRowKeys.length === 0}
+                >
+                  批量拒绝
+                </Button>
+              </>
+            )}
+          </Space>
           <Select
             placeholder="业务模块"
             allowClear
@@ -308,25 +328,7 @@ export default function ApprovalTaskCenter() {
             onChange={handleModuleChange}
             options={MODULE_LIST.map(m => ({ label: m.name, value: m.code }))}
           />
-          {activeTab === 'todo' && (
-            <>
-              <Button
-                type="primary"
-                onClick={() => handleOpenOpinion('approve')}
-                disabled={selectedRowKeys.length === 0}
-              >
-                批量通过
-              </Button>
-              <Button
-                danger
-                onClick={() => handleOpenOpinion('reject')}
-                disabled={selectedRowKeys.length === 0}
-              >
-                批量拒绝
-              </Button>
-            </>
-          )}
-        </Space>
+        </div>
 
         <Table
           rowKey="id"
