@@ -9,6 +9,7 @@ import {
   UserOutlined,
   ApiOutlined,
   BugOutlined,
+  DatabaseOutlined,
 } from '@ant-design/icons';
 
 const { Header, Content } = Layout;
@@ -79,6 +80,9 @@ export default function EnterpriseLayout() {
               我的申请
             </Menu.Item>
           </Menu.SubMenu>
+          <Menu.Item key="/database-service/manage" icon={<DatabaseOutlined />}>
+            数据库服务
+          </Menu.Item>
         </Menu>
       </Header>
       <Content style={{ padding: 24, background: '#F7FAFD', minHeight: 'calc(100vh - 64px)' }}>
