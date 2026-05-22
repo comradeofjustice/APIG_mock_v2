@@ -7,6 +7,8 @@ import {
   SettingOutlined,
   SnippetsOutlined,
   UserOutlined,
+  ApiOutlined,
+  BugOutlined,
 } from '@ant-design/icons';
 
 const { Header, Content } = Layout;
@@ -50,6 +52,18 @@ export default function EnterpriseLayout() {
           <Menu.Item key="/verification-history" icon={<HistoryOutlined />}>
             验证历史
           </Menu.Item>
+          <Menu.SubMenu
+            key="api-management"
+            icon={<ApiOutlined />}
+            title="API 管理"
+          >
+            <Menu.Item key="/api-management" icon={<ApiOutlined />}>
+              API 列表
+            </Menu.Item>
+            <Menu.Item key="/api-management/debug" icon={<BugOutlined />}>
+              API 调试
+            </Menu.Item>
+          </Menu.SubMenu>
           <Menu.SubMenu
             key="approval-group"
             icon={<SettingOutlined />}

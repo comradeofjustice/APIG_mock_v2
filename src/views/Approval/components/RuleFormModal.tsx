@@ -22,8 +22,6 @@ import {
   Tooltip,
 } from 'antd';
 import {
-  PlusOutlined,
-  DeleteOutlined,
   InfoCircleOutlined,
 } from '@ant-design/icons';
 import type { ApprovalRule, ApprovalRuleForm, UserItem, ApprovalFlow } from '../types';
@@ -258,7 +256,6 @@ export default function RuleFormModal({
                 <Button
                   type="text"
                   danger
-                  icon={<DeleteOutlined />}
                   onClick={() => handleRemoveLevel(index)}
                 >
                   删除
@@ -282,7 +279,6 @@ export default function RuleFormModal({
 
         <Button
           type="dashed"
-          icon={<PlusOutlined />}
           onClick={handleAddLevel}
           disabled={approvalFlow.length >= 4}
           block

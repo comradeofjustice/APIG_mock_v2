@@ -22,7 +22,6 @@ import {
   Tooltip,
 } from 'antd';
 import {
-  PlusOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
@@ -274,7 +273,6 @@ export default function ApprovalRuleManage() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
           <Button
             type="primary"
-            icon={<PlusOutlined />}
             onClick={handleAdd}
           >
             新增规则
