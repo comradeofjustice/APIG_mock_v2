@@ -378,42 +378,46 @@ export default function ApiDefinitionDrawer({
       visible={visible}
       onClose={onClose}
       extra={
-        <Space size="small">
-          <Dropdown
-            overlay={
-              <Menu>
-                <Menu.Item key="openapi" onClick={handleExportOpenApi}>
-                  导出 OpenAPI 文档
-                </Menu.Item>
-                <Menu.Item key="word" onClick={handleExportWord}>
-                  导出 Word 文档
-                </Menu.Item>
-              </Menu>
-            }
-          >
-            <Button>
-              导出文档
-            </Button>
-          </Dropdown>
-          {!editing && (
-            <Button
-              type="primary"
-              onClick={() => setEditing(true)}
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <Space size="small">
+            <Dropdown
+              overlay={
+                <Menu>
+                  <Menu.Item key="openapi" onClick={handleExportOpenApi}>
+                    导出 OpenAPI 文档
+                  </Menu.Item>
+                  <Menu.Item key="word" onClick={handleExportWord}>
+                    导出 Word 文档
+                  </Menu.Item>
+                </Menu>
+              }
             >
-              编辑
-            </Button>
-          )}
-        </Space>
+              <Button>
+                导出文档
+              </Button>
+            </Dropdown>
+            {!editing && (
+              <Button
+                type="primary"
+                onClick={() => setEditing(true)}
+              >
+                编辑
+              </Button>
+            )}
+          </Space>
+        </div>
       }
       footer={
-        editing && (
-          <Space>
-            <Button onClick={handleCancelEdit}>取消</Button>
-            <Button type="primary" onClick={handleSave}>
-              保存
-            </Button>
-          </Space>
-        )
+        editing ? (
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Space>
+              <Button onClick={handleCancelEdit}>取消</Button>
+              <Button type="primary" onClick={handleSave}>
+                保存
+              </Button>
+            </Space>
+          </div>
+        ) : null
       }
     >
       <Spin spinning={loading}>
