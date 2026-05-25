@@ -5,8 +5,10 @@ import Home from '@/views/Home';
 import MultimodalValidation from '@/views/MultimodalValidation';
 import VerificationHistory from '@/views/VerificationHistory';
 import { ApprovalLayout, ApprovalRuleManage, ApprovalTaskCenter, MyApplications } from '@/views/Approval';
-import { ApiManagePage, ApiDebugPage } from '@/views/ApiManagement';
+import { ApiManagePage, ApiDebugPage as ApiManagementDebugPage } from '@/views/ApiManagement';
 import DatabaseServiceManage from '@/views/DatabaseService/DatabaseServiceManage';
+import SQLToApi from '@/views/SQLToApi';
+import SqlApiDebugPage from '@/views/SQLToApi/ApiDebugPage';
 
 /**
  * 路由注册集中在此文件（与 project_description.md 中「路由注册文件」一致）。
@@ -32,12 +34,21 @@ export const routes: RouteObject[] = [
   },
   {
     path: '/api-management/debug',
-    element: React.createElement(ApiDebugPage),
+    element: React.createElement(ApiManagementDebugPage),
   },
   // ========== 数据库服务管理模块 ==========
   {
     path: '/database-service/manage',
     element: React.createElement(DatabaseServiceManage),
+  },
+  // ========== SQL转API模块 ==========
+  {
+    path: '/sql-to-api',
+    element: React.createElement(SQLToApi),
+  },
+  {
+    path: '/sql-to-api/debug/:id',
+    element: React.createElement(SqlApiDebugPage),
   },
   // ========== 审批与规则控制模块 ==========
   {
