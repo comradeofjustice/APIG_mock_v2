@@ -7,6 +7,7 @@ import VerificationHistory from '@/views/VerificationHistory';
 import { ApprovalLayout, ApprovalRuleManage, ApprovalTaskCenter, MyApplications } from '@/views/Approval';
 import { ApiManagePage, ApiDebugPage as ApiManagementDebugPage } from '@/views/ApiManagement';
 import DatabaseServiceManage from '@/views/DatabaseService/DatabaseServiceManage';
+import { DatabaseDebugPage } from '@/views/DatabaseService';
 import SQLToApi from '@/views/SQLToApi';
 import SqlApiDebugPage from '@/views/SQLToApi/ApiDebugPage';
 
@@ -40,6 +41,10 @@ export const routes: RouteObject[] = [
   {
     path: '/database-service/manage',
     element: React.createElement(DatabaseServiceManage),
+  },
+  {
+    path: '/database-service/debug',
+    element: React.createElement(DatabaseDebugPage, { mode: 'page' }),
   },
   // ========== SQL转API模块 ==========
   {

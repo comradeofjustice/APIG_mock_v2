@@ -80,9 +80,18 @@ export default function EnterpriseLayout() {
               我的申请
             </Menu.Item>
           </Menu.SubMenu>
-          <Menu.Item key="/database-service/manage" icon={<DatabaseOutlined />}>
-            数据库服务
-          </Menu.Item>
+          <Menu.SubMenu
+            key="database-service"
+            icon={<DatabaseOutlined />}
+            title="数据库服务"
+          >
+            <Menu.Item key="/database-service/manage" icon={<DatabaseOutlined />}>
+              服务管理
+            </Menu.Item>
+            <Menu.Item key="/database-service/debug" icon={<BugOutlined />}>
+              数据库调试
+            </Menu.Item>
+          </Menu.SubMenu>
         </Menu>
       </Header>
       <Content style={{ padding: 24, background: '#F7FAFD', minHeight: 'calc(100vh - 64px)' }}>
