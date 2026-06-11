@@ -1,4 +1,4 @@
-import React, { type CSSProperties } from 'react';
+import { type CSSProperties } from 'react';
 import { Button, Checkbox, Input, Radio, Select, Slider, Switch } from 'antd';
 
 import type { CapabilityModule, StrategyField } from './capabilityData';
@@ -14,7 +14,7 @@ type AiCapabilityWorkbenchProps = {
 function renderField(field: StrategyField) {
   switch (field.kind) {
     case 'input':
-      return <Input size="large" defaultValue={field.value} suffix={field.suffix} />;
+      return <Input defaultValue={field.value} suffix={field.suffix} />;
     case 'textarea':
       return (
         <TextArea
@@ -24,7 +24,7 @@ function renderField(field: StrategyField) {
       );
     case 'select':
       return (
-        <Select size="large" defaultValue={field.value}>
+        <Select defaultValue={field.value}>
           {field.options.map((option) => (
             <Select.Option key={option} value={option}>
               {option}

@@ -1,5 +1,5 @@
-import { useState, type CSSProperties, type ReactNode } from 'react';
-import { Avatar, Grid } from 'antd';
+import React, { useState, type CSSProperties } from 'react';
+import { Alert, Avatar, Grid, Menu } from 'antd';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   ApartmentOutlined,
@@ -36,7 +36,7 @@ type NavSection = {
   key: string;
   label: string;
   path?: string;
-  icon: ReactNode;
+  icon: React.ReactNode;
   breadcrumbs?: string[];
   children?: NavLeaf[];
 };
@@ -200,6 +200,27 @@ function resolveNavTarget(pathname: string, search: string): NavTarget {
   return matchByBasePath?.item ?? defaultTarget;
 }
 
+function buildMenuItems(
+  sections: NavSection[]
+): React.ReactNode {
+  return sections.map((section) => {
+    if (section.children && section.children.length > 0) {
+      return (
+        <Menu.SubMenu key={section.key} icon={section.icon} title={section.label}>
+          {section.children.map((child) => (
+            <Menu.Item key={child.path}>{child.label}</Menu.Item>
+          ))}
+        </Menu.SubMenu>
+      );
+    }
+    return (
+      <Menu.Item key={section.path!} icon={section.icon}>
+        {section.label}
+      </Menu.Item>
+    );
+  });
+}
+
 export default function EnterpriseLayout() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -209,7 +230,6 @@ export default function EnterpriseLayout() {
   const activeSectionKey = activeTarget.sectionKey;
 
   const [manualCollapsed, setManualCollapsed] = useState(false);
-  const [expandedSection, setExpandedSection] = useState<string>('ai-compliance');
 
   const responsiveCollapsed = !screens.lg;
   const collapsed = responsiveCollapsed || manualCollapsed;
@@ -223,30 +243,21 @@ export default function EnterpriseLayout() {
     '--shell-muted': '#8C95A8',
   } as CSSProperties;
 
-  const handleSectionClick = (section: NavSection) => {
-    if (section.children?.length) {
-      if (collapsed) {
+  const selectedKeys = [activeTarget.isChild ? activeTarget.path : activeSectionKey];
+  const openKeys = collapsed ? [] : [activeSectionKey];
+
+  const handleMenuClick = (e: { key: React.Key }) => {
+    const path = e.key as string;
+    if (path.startsWith('/')) {
+      navigate(path);
+    } else {
+      const section = navSections.find((s) => s.key === path);
+      if (section?.path) {
+        navigate(section.path);
+      } else if (section?.children?.length) {
         navigate(section.children[0].path);
-        return;
       }
-
-      setExpandedSection((current) => (current === section.key ? '' : section.key));
-
-      if (activeSectionKey !== section.key) {
-        navigate(section.children[0].path);
-      }
-
-      return;
     }
-
-    if (section.path) {
-      navigate(section.path);
-    }
-  };
-
-  const handleChildClick = (path: string) => {
-    setExpandedSection('ai-compliance');
-    navigate(path);
   };
 
   return (
@@ -290,56 +301,18 @@ export default function EnterpriseLayout() {
 
       <div className="enterprise-shell__workspace">
         <aside className="enterprise-shell__sider">
-          <nav className="enterprise-shell__nav">
-            {navSections.map((section) => {
-              const hasChildren = Boolean(section.children?.length);
-              const isActive = activeSectionKey === section.key;
-              const isExpanded = hasChildren && !collapsed && (expandedSection === section.key || isActive);
-
-              return (
-                <section
-                  key={section.key}
-                  className={[
-                    'nav-section',
-                    isActive ? 'nav-section--active' : '',
-                    isExpanded ? 'nav-section--expanded' : '',
-                  ]
-                    .filter(Boolean)
-                    .join(' ')}
-                >
-                  <button
-                    type="button"
-                    className="nav-section__trigger"
-                    onClick={() => handleSectionClick(section)}
-                    title={collapsed ? section.label : undefined}
-                  >
-                    <span className="nav-section__icon">{section.icon}</span>
-                    <span className="nav-section__label">{section.label}</span>
-                    <DownOutlined className="nav-section__chevron" />
-                  </button>
-
-                  {hasChildren && isExpanded && (
-                    <div className="nav-section__children">
-                      {section.children?.map((child) => {
-                        const childActive = activeTarget.path === child.path || (location.pathname === '/' && child.path === defaultTarget.path);
-
-                        return (
-                          <button
-                            key={child.key}
-                            type="button"
-                            className={`nav-section__child ${childActive ? 'nav-section__child--active' : ''}`}
-                            onClick={() => handleChildClick(child.path)}
-                          >
-                            {child.label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </section>
-              );
-            })}
-          </nav>
+          <div className="enterprise-shell__nav">
+            <Menu
+              mode="inline"
+              inlineCollapsed={collapsed}
+              selectedKeys={selectedKeys}
+              defaultOpenKeys={openKeys}
+              onClick={handleMenuClick}
+              className="enterprise-menu"
+            >
+              {buildMenuItems(navSections)}
+            </Menu>
+          </div>
 
           <button
             type="button"
@@ -352,23 +325,13 @@ export default function EnterpriseLayout() {
         </aside>
 
         <main className="enterprise-shell__main">
-          <div className="enterprise-shell__notice">
-            <div className="enterprise-shell__notice-message">
-              维保期将于92天后过期，升级功能将被锁定，您将无法享受产品技术支持、故障维修等售后服务！
-            </div>
-            <div className="enterprise-shell__notice-meta">
-              <span>1/2</span>
-              <button type="button" className="enterprise-shell__mini-button" aria-label="上一条">
-                <LeftOutlined />
-              </button>
-              <button type="button" className="enterprise-shell__mini-button" aria-label="下一条">
-                <RightOutlined />
-              </button>
-              <button type="button" className="enterprise-shell__mini-button" aria-label="关闭公告">
-                <CloseOutlined />
-              </button>
-            </div>
-          </div>
+          <Alert
+            className="enterprise-shell__notice"
+            message="维保期将于92天后过期，升级功能将被锁定，您将无法享受产品技术支持、故障维修等售后服务！"
+            type="warning"
+            showIcon
+            closable
+          />
 
           <div className="enterprise-shell__breadcrumb">
             <HomeOutlined className="enterprise-shell__breadcrumb-home" />

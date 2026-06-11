@@ -5,3 +5,5 @@ export { default as SafeSteerPage } from './SafeSteerPage';
 export { default as ContentTaggingPage } from './ContentTaggingPage';
 export { default as RagGuardPage } from './RagGuardPage';
 export { default as McpGuardPage } from './McpGuardPage';
+export { default as AiCapabilityWorkbench } from './AiCapabilityWorkbench';
+export { capabilityModules, capabilityRouteMap, resolveCapabilityKey } from './capabilityData';

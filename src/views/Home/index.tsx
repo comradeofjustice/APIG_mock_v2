@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 
-import { capabilityRouteMap, resolveCapabilityKey } from './capabilityData';
+import { capabilityRouteMap, resolveCapabilityKey } from '@/views/AiCompliance/capabilityData';
 
 export default function Home() {
   const location = useLocation();

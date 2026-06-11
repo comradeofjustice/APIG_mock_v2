@@ -17,7 +17,7 @@ const router = createBrowserRouter([
 
 render(
   <React.StrictMode>
-    <ConfigProvider locale={zhCN}>
+    <ConfigProvider locale={zhCN} componentSize="middle">
       <RouterProvider router={router} />
     </ConfigProvider>
   </React.StrictMode>,

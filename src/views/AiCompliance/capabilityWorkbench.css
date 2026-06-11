@@ -1,42 +1,5 @@
-.capability-page--formal {
-  min-height: 100%;
-  padding: 18px;
-  background: linear-gradient(180deg, #f6f8fc 0%, #f2f5fa 100%);
-}
-
-.capability-page--formal * {
-  box-sizing: border-box;
-  min-width: 0;
-}
-
-.capability-page--formal .ant-input,
-.capability-page--formal .ant-input-affix-wrapper,
-.capability-page--formal .ant-select-selector,
-.capability-page--formal .ant-radio-button-wrapper,
-.capability-page--formal .ant-btn {
-  border-radius: 8px;
-}
-
-.capability-page--formal .ant-input,
-.capability-page--formal .ant-input-affix-wrapper,
-.capability-page--formal .ant-input-textarea textarea,
-.capability-page--formal .ant-select-selector {
-  border-color: #d9e2f0;
-  box-shadow: none !important;
-}
-
 .capability-page--formal .ant-input-textarea textarea {
   resize: none;
-}
-
-.capability-page--formal .ant-select:not(.ant-select-customize-input) .ant-select-selector {
-  height: 40px;
-  padding: 4px 12px;
-}
-
-.capability-page--formal .ant-select-selection-item,
-.capability-page--formal .ant-select-selection-placeholder {
-  line-height: 30px !important;
 }
 
 .capability-page--formal .ant-radio-group {
@@ -49,7 +12,7 @@
   height: auto;
   padding: 8px 12px;
   line-height: 1.4;
-  border: 1px solid #d9e2f0;
+  border: 1px solid #d9d9d9;
 }
 
 .capability-page--formal .ant-radio-button-wrapper::before {
@@ -91,37 +54,22 @@
   border-color: var(--cap-accent);
 }
 
-.capability-page--formal .ant-btn {
-  height: 38px;
-  padding-inline: 16px;
-}
-
 .capability-page--formal .ant-btn-primary {
   background: var(--cap-accent);
   border-color: var(--cap-accent);
 }
 
+/* 布局 */
 .capability-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.9fr);
-  gap: 18px;
+  gap: 16px;
   align-items: start;
 }
 
+/* 卡片基础框架样式 */
 .capability-card {
-  background: #fff;
-  border: 1px solid #e3e9f3;
-  border-radius: 14px;
-  box-shadow: 0 10px 24px rgba(35, 49, 79, 0.04);
-}
-
-.capability-card--config,
-.capability-card--output {
-  padding: 18px;
-}
-
-.capability-card--config {
-  border-top: 3px solid var(--cap-accent);
+  padding: 24px;
 }
 
 .capability-card__head {
@@ -134,9 +82,9 @@
 
 .capability-card__title {
   color: #21304c;
-  font-size: 18px;
-  font-weight: 700;
-  line-height: 1.3;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
 }
 
 .capability-card__actions {
@@ -144,24 +92,28 @@
   gap: 10px;
 }
 
+/* 表单区域 */
 .strategy-form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
+/* Section 样式 - 统一使用标准边框和背景 */
 .strategy-section {
   padding: 16px;
-  background: #fafbfd;
-  border: 1px solid #edf1f7;
-  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
 }
 
 .strategy-section__title {
-  margin-bottom: 14px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
   color: #24314f;
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .strategy-field-grid {
@@ -183,7 +135,7 @@
 .strategy-field__label {
   color: #43526e;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .strategy-field__helper {
@@ -208,6 +160,7 @@
   white-space: nowrap;
 }
 
+/* 结构化输出 */
 .structured-output-list {
   display: flex;
   flex-direction: column;
@@ -216,9 +169,9 @@
 
 .structured-output {
   overflow: hidden;
-  background: #fafbfd;
-  border: 1px solid #edf1f7;
-  border-radius: 12px;
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
 }
 
 .structured-output__head {
@@ -226,18 +179,18 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 12px 14px;
+  padding: 10px 14px;
   color: #22314f;
-  font-size: 14px;
-  font-weight: 700;
-  background: color-mix(in srgb, var(--cap-soft) 42%, white);
-  border-bottom: 1px solid #e7edf6;
+  font-size: 13px;
+  font-weight: 600;
+  background: #f5f5f5;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .structured-output__head span:last-child {
   color: #71809a;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .structured-output pre {
@@ -253,6 +206,7 @@
   word-break: break-word;
 }
 
+/* 响应式 */
 @media (max-width: 1200px) {
   .capability-layout {
     grid-template-columns: 1fr;
@@ -279,13 +233,8 @@
 }
 
 @media (max-width: 640px) {
-  .capability-page--formal {
-    padding: 14px;
-  }
-
-  .capability-card--config,
-  .capability-card--output {
-    padding: 14px;
+  .capability-card {
+    padding: 16px;
   }
 
   .capability-card__actions {

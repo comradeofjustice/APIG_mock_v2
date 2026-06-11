@@ -218,53 +218,11 @@ export type CapabilityModule = {
   flowSteps: FlowStep[];
 };
 
-const promptTheme: CapabilityTheme = {
+const standardTheme: CapabilityTheme = {
   base: '#3B71EE',
   soft: '#EAF2FF',
   line: '#CFE0FF',
   contrast: '#234A9D',
-};
-
-const codeTheme: CapabilityTheme = {
-  base: '#157A73',
-  soft: '#E7F8F5',
-  line: '#C8ECE6',
-  contrast: '#0F5C56',
-};
-
-const multimodalTheme: CapabilityTheme = {
-  base: '#C26A22',
-  soft: '#FFF3E8',
-  line: '#FFDABA',
-  contrast: '#8E4A13',
-};
-
-const steerTheme: CapabilityTheme = {
-  base: '#5C57D6',
-  soft: '#F0EEFF',
-  line: '#D9D6FF',
-  contrast: '#3D38A8',
-};
-
-const taggingTheme: CapabilityTheme = {
-  base: '#A97812',
-  soft: '#FFF7E8',
-  line: '#FFE2AE',
-  contrast: '#78530D',
-};
-
-const ragTheme: CapabilityTheme = {
-  base: '#2468C8',
-  soft: '#EDF4FF',
-  line: '#D4E5FF',
-  contrast: '#1A509C',
-};
-
-const mcpTheme: CapabilityTheme = {
-  base: '#9C4D62',
-  soft: '#FFF0F4',
-  line: '#F4CFD8',
-  contrast: '#7A394B',
 };
 
 export const capabilitySectionAlias: Record<string, string> = {
@@ -294,7 +252,7 @@ export const capabilityModules: Record<string, CapabilityModule> = {
       '把实时拦截、深度研判和语义理解放进一个面向业务的策略页里，适合安全管理员直接配置提示词防护链路，并查看会话级处置结果。',
     audience: '安全运营 / AI 应用管理员',
     businessScene: '对外知识助手承接制度咨询与工单问答',
-    theme: promptTheme,
+    theme: standardTheme,
     summaryMetrics: [
       { label: '实时规则组', value: '18 组', helper: '会话入站首层拦截' },
       { label: '意图模型链路', value: '双引擎', helper: '主判定 + 深度研判' },
@@ -510,7 +468,7 @@ export const capabilityModules: Record<string, CapabilityModule> = {
       '把代码生成场景里的风险扫描、等级判定和结构化输出合并到一个业务页里，让研发、安全和审批负责人看到同一份结果。',
     audience: '研发负责人 / 安全评审 / 平台治理',
     businessScene: '研发助手为支付清结算服务生成 Java 接口代码',
-    theme: codeTheme,
+    theme: standardTheme,
     summaryMetrics: [
       { label: '扫描规则', value: '36 条', helper: '弱风险、加密、提权、泄露全覆盖' },
       { label: '语言范围', value: 'Java / JS / Python', helper: '支持多语言统一策略' },
@@ -702,7 +660,7 @@ export const capabilityModules: Record<string, CapabilityModule> = {
       '把图像审核、视频检测、自动拦截和人工复核放在同一页里，适合内容运营、安全运营和审核员共同查看。',
     audience: '内容运营 / 审核专员 / 安全运营',
     businessScene: '活动运营上传海报和短视频后自动审核',
-    theme: multimodalTheme,
+    theme: standardTheme,
     summaryMetrics: [
       { label: '图像规则', value: '24 条', helper: '暴力、有害、敏感内容全量覆盖' },
       { label: '视频采样', value: '1 秒 4 帧', helper: '帧级检测与整体分析结合' },
@@ -904,7 +862,7 @@ export const capabilityModules: Record<string, CapabilityModule> = {
       '不只是在输入前拦截，而是在模型推理过程中动态调整回复轨迹，把 SafeSteer、自动决策和多级干预做成可配置界面。',
     audience: '模型治理 / 客服运营 / 安全策略负责人',
     businessScene: '客服助手回答设备加固与攻防问答时做推理期干预',
-    theme: steerTheme,
+    theme: standardTheme,
     summaryMetrics: [
       { label: '干预模式', value: '低延迟', helper: '优先保证客服响应速度' },
       { label: '平均延迟', value: '84 ms', helper: '干预发生在推理阶段，不需整体重跑' },
@@ -1091,7 +1049,7 @@ export const capabilityModules: Record<string, CapabilityModule> = {
       '把违规内容分类、风险等级标记和分级流转变成一套审核工作台，用于自动归类大模型输出、客服回复和社区内容。',
     audience: '审核中心 / 内容运营 / 合规管理',
     businessScene: '审核中心对模型生成说明文、评论和客服答复自动打标入队',
-    theme: taggingTheme,
+    theme: standardTheme,
     summaryMetrics: [
       { label: '分类体系', value: '5 大类', helper: '暴力、色情、政治敏感、仇恨言论等' },
       { label: '标记档位', value: '4 档', helper: '高危 / 中危 / 低危 / 信息' },
@@ -1266,7 +1224,7 @@ export const capabilityModules: Record<string, CapabilityModule> = {
       '围绕检索增强场景，把查询意图判定、敏感信息获取识别、访问绕过拦截和授权知识源校验整合成一页业务界面。',
     audience: '知识库管理员 / 数据安全 / 业务运营',
     businessScene: '员工通过知识助手检索制度与客户资料',
-    theme: ragTheme,
+    theme: standardTheme,
     summaryMetrics: [
       { label: '意图规则', value: '31 条', helper: '覆盖敏感获取、越权遍历和批量试探' },
       { label: '查询解析', value: '已开启', helper: '对自然语言检索进行意图重写' },
@@ -1448,7 +1406,7 @@ export const capabilityModules: Record<string, CapabilityModule> = {
       '围绕多 Agent 和工具编排场景，把 MCP 消息内容检测、协议漏洞利用识别和上下文污染拦截放成一张可操作的策略界面。',
     audience: 'Agent 平台管理员 / 安全运营 / 工具链负责人',
     businessScene: '多 Agent 编排平台通过 MCP 调用工单和数据库工具',
-    theme: mcpTheme,
+    theme: standardTheme,
     summaryMetrics: [
       { label: '消息规则', value: '22 条', helper: '覆盖恶意指令、注入和协议利用' },
       { label: '上下文规则', value: '14 条', helper: '共享记忆和工具返回同步检测' },

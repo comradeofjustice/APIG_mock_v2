@@ -1,5 +1,5 @@
-import AiCapabilityWorkbench from '@/views/Home/AiCapabilityWorkbench';
-import { capabilityModules } from '@/views/Home/capabilityData';
+import AiCapabilityWorkbench from './AiCapabilityWorkbench';
+import { capabilityModules } from './capabilityData';
 
 export default function McpGuardPage() {
   return <AiCapabilityWorkbench module={capabilityModules['mcp-guard']} />;
