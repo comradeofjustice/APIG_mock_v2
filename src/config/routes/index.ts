@@ -2,6 +2,15 @@ import React from 'react';
 import type { RouteObject } from 'react-router-dom';
 
 import Home from '@/views/Home';
+import {
+  CodeSafetyPage,
+  ContentTaggingPage,
+  McpGuardPage,
+  MultimodalGuardPage,
+  PromptSafetyPage,
+  RagGuardPage,
+  SafeSteerPage,
+} from '@/views/AiCompliance';
 import MultimodalValidation from '@/views/MultimodalValidation';
 import VerificationHistory from '@/views/VerificationHistory';
 import { ApprovalLayout, ApprovalRuleManage, ApprovalTaskCenter, MyApplications } from '@/views/Approval';
@@ -19,6 +28,34 @@ export const routes: RouteObject[] = [
   {
     path: '/',
     element: React.createElement(Home),
+  },
+  {
+    path: '/ai-compliance/prompt-safety',
+    element: React.createElement(PromptSafetyPage),
+  },
+  {
+    path: '/ai-compliance/code-safety',
+    element: React.createElement(CodeSafetyPage),
+  },
+  {
+    path: '/ai-compliance/multimodal-guard',
+    element: React.createElement(MultimodalGuardPage),
+  },
+  {
+    path: '/ai-compliance/safe-steer',
+    element: React.createElement(SafeSteerPage),
+  },
+  {
+    path: '/ai-compliance/content-tagging',
+    element: React.createElement(ContentTaggingPage),
+  },
+  {
+    path: '/ai-compliance/rag-guard',
+    element: React.createElement(RagGuardPage),
+  },
+  {
+    path: '/ai-compliance/mcp-guard',
+    element: React.createElement(McpGuardPage),
   },
   {
     path: '/multimodal-validation',
