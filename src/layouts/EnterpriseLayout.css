@@ -142,8 +142,11 @@
   box-shadow: inset -1px 0 0 rgba(19, 34, 66, 0.02);
 }
 
+.ant-menu.ant-menu-inline-collapsed {
+  width: 56px !important;
+}
 .enterprise-shell.is-collapsed .enterprise-shell__sider {
-  width: 72px;
+  width: 56px;
 }
 
 .enterprise-shell__nav {
@@ -236,12 +239,22 @@
 .enterprise-menu.ant-menu-inline-collapsed .ant-menu-item,
 .enterprise-menu.ant-menu-inline-collapsed .ant-menu-submenu-title {
   padding: 0 !important;
-  text-align: center;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
 }
 
 .enterprise-menu.ant-menu-inline-collapsed .ant-menu-item .anticon,
 .enterprise-menu.ant-menu-inline-collapsed .ant-menu-submenu-title .anticon {
   font-size: 16px;
+  margin-right: 0 !important;
+}
+
+/* 收起后隐藏文字和箭头 */
+.enterprise-menu.ant-menu-inline-collapsed .ant-menu-item span:not(.anticon),
+.enterprise-menu.ant-menu-inline-collapsed .ant-menu-submenu-title span:not(.anticon),
+.enterprise-menu.ant-menu-inline-collapsed .ant-menu-submenu-arrow {
+  display: none !important;
 }
 
 .enterprise-shell__collapse {
@@ -269,7 +282,7 @@
 }
 
 .enterprise-shell.is-collapsed .enterprise-shell__main {
-  margin-left: 72px;
+  margin-left: 56px;
 }
 
 .enterprise-shell__notice {
