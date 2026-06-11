@@ -188,17 +188,21 @@ function PromptSafetyConfigForm(props: {
   mode: string;
   selectedStrategies: string[];
   intentAnalysisEnabled: boolean;
+  userProfileEnabled: boolean;
   onModeChange: (mode: string) => void;
   onStrategyChange: (values: string[]) => void;
   onIntentAnalysisChange: (checked: boolean) => void;
+  onUserProfileChange: (checked: boolean) => void;
 }) {
   const {
     mode,
     selectedStrategies,
     intentAnalysisEnabled,
+    userProfileEnabled,
     onModeChange,
     onStrategyChange,
     onIntentAnalysisChange,
+    onUserProfileChange,
   } = props;
 
   const strategyOptions = ['越狱攻击', '提示注入', '角色重写', '隐藏指令套取', '多轮试探'];
@@ -206,7 +210,7 @@ function PromptSafetyConfigForm(props: {
   return (
     <div className="strategy-form">
       <section className="strategy-section">
-        <div className="strategy-section__title">检测严格程度</div>
+        <div className="strategy-section__title">动态差异化防护策略</div>
 
         <div className="strategy-field-grid">
           <div className="strategy-field is-span-2">
@@ -257,6 +261,23 @@ function PromptSafetyConfigForm(props: {
           </div>
         </div>
       </section>
+
+      <section className="strategy-section">
+        <div className="strategy-section__title">用户画像规则</div>
+
+        <div className="strategy-field-grid">
+          <div className="strategy-field is-span-2">
+            <div className="strategy-field__label">基于用户行为画像构建规则</div>
+            <div className="strategy-field__control">
+              <div className="strategy-switch">
+                <Switch checked={userProfileEnabled} onChange={onUserProfileChange} />
+                <span className="strategy-switch__text">{userProfileEnabled ? '已开启' : '已关闭'}</span>
+              </div>
+            </div>
+            <div className="strategy-field__helper">结合历史行为和交互模式生成用户风险画像，用于匹配差异化防护策略。</div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
@@ -266,8 +287,9 @@ function PromptSafetyLiveResult(props: {
   mode: string;
   selectedStrategies: string[];
   intentAnalysisEnabled: boolean;
+  userProfileEnabled: boolean;
 }) {
-  const { module, mode, selectedStrategies, intentAnalysisEnabled } = props;
+  const { module, mode, selectedStrategies, intentAnalysisEnabled, userProfileEnabled } = props;
   const [draftPrompt, setDraftPrompt] = useState(() => buildPromptSafetyExample(module));
   const [lastValidatedAt, setLastValidatedAt] = useState(() => formatValidationTime(new Date()));
   const [validationCount, setValidationCount] = useState(1);
@@ -316,6 +338,7 @@ function PromptSafetyLiveResult(props: {
               <Tag key={strategy}>{strategy}</Tag>
             ))}
             <Tag>{intentAnalysisEnabled ? '意图分析已开启' : '意图分析已关闭'}</Tag>
+            <Tag>{userProfileEnabled ? '用户画像规则已开启' : '用户画像规则已关闭'}</Tag>
           </div>
 
           <div className="code-live-toolbar__actions">
@@ -1222,6 +1245,7 @@ export default function AiCapabilityWorkbench(props: AiCapabilityWorkbenchProps)
   const [promptSafetyMode, setPromptSafetyMode] = useState('平衡模式');
   const [promptSafetyStrategies, setPromptSafetyStrategies] = useState(['越狱攻击', '提示注入', '角色重写']);
   const [promptIntentAnalysisEnabled, setPromptIntentAnalysisEnabled] = useState(true);
+  const [promptUserProfileEnabled, setPromptUserProfileEnabled] = useState(true);
   const [safeSteerMode, setSafeSteerMode] = useState(getFieldPreset(module, '干预模式') || '弹性校准');
   const [ragStrategies, setRagStrategies] = useState(['Chunk 注入识别', '越权检索意图', '未授权来源校验']);
   const [mcpStrategies, setMcpStrategies] = useState(['恶意指令', '注入攻击', '漏洞利用']);
@@ -1251,9 +1275,11 @@ export default function AiCapabilityWorkbench(props: AiCapabilityWorkbenchProps)
               mode={promptSafetyMode}
               selectedStrategies={promptSafetyStrategies}
               intentAnalysisEnabled={promptIntentAnalysisEnabled}
+              userProfileEnabled={promptUserProfileEnabled}
               onModeChange={setPromptSafetyMode}
               onStrategyChange={setPromptSafetyStrategies}
               onIntentAnalysisChange={setPromptIntentAnalysisEnabled}
+              onUserProfileChange={setPromptUserProfileEnabled}
             />
           ) : useCodeSafetyConfig ? (
             <CodeSafetyConfigForm module={module} />
@@ -1309,6 +1335,7 @@ export default function AiCapabilityWorkbench(props: AiCapabilityWorkbenchProps)
               mode={promptSafetyMode}
               selectedStrategies={promptSafetyStrategies}
               intentAnalysisEnabled={promptIntentAnalysisEnabled}
+              userProfileEnabled={promptUserProfileEnabled}
             />
           ) : useCodeSafetyLiveResult ? (
             <CodeSafetyLiveResult module={module} />

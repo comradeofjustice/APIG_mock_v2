@@ -260,8 +260,8 @@ export const capabilityModules: Record<string, CapabilityModule> = {
     ],
     formSections: [
       {
-        title: '检测严格程度',
-        description: '控制提示词检测在误报与强拦截之间的取舍。',
+        title: '动态差异化防护策略',
+        description: '根据当前会话风险和业务场景动态调整防护强度。',
         fields: [
           {
             kind: 'radio',
@@ -298,6 +298,21 @@ export const capabilityModules: Record<string, CapabilityModule> = {
             checkedLabel: '已开启',
             uncheckedLabel: '已关闭',
             helper: '开启后识别隐藏恶意目标和越狱企图，关闭后仅做基础规则检测。',
+            span: 2,
+          },
+        ],
+      },
+      {
+        title: '用户画像规则',
+        description: '基于用户历史行为画像匹配差异化防护策略。',
+        fields: [
+          {
+            kind: 'switch',
+            label: '基于用户行为画像构建规则',
+            checked: true,
+            checkedLabel: '已开启',
+            uncheckedLabel: '已关闭',
+            helper: '结合历史行为和交互模式生成用户风险画像，用于动态切换防护策略。',
             span: 2,
           },
         ],
@@ -430,7 +445,6 @@ export const capabilityModules: Record<string, CapabilityModule> = {
             label: '规则族',
             value: ['弱风险用法', '不安全加密', '权限提升', '数据泄露'],
             options: ['弱风险用法', '不安全加密', '权限提升', '数据泄露', '依赖漏洞'],
-            helper: '与投标要求里的四类能力一一对应。',
             span: 2,
           },
           {
