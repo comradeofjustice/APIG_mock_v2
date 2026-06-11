@@ -3,8 +3,8 @@ import type { RouteObject } from 'react-router-dom';
 
 import Home from '@/views/Home';
 import {
+  A2aGuardPage,
   CodeSafetyPage,
-  ContentTaggingPage,
   McpGuardPage,
   MultimodalGuardPage,
   PromptSafetyPage,
@@ -46,16 +46,16 @@ export const routes: RouteObject[] = [
     element: React.createElement(SafeSteerPage),
   },
   {
-    path: '/ai-compliance/content-tagging',
-    element: React.createElement(ContentTaggingPage),
-  },
-  {
     path: '/ai-compliance/rag-guard',
     element: React.createElement(RagGuardPage),
   },
   {
     path: '/ai-compliance/mcp-guard',
     element: React.createElement(McpGuardPage),
+  },
+  {
+    path: '/ai-compliance/a2a-guard',
+    element: React.createElement(A2aGuardPage),
   },
   {
     path: '/multimodal-validation',

@@ -11,10 +11,8 @@ import {
   DownOutlined,
   ExpandAltOutlined,
   HomeOutlined,
-  LeftOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  RightOutlined,
   SafetyCertificateOutlined,
   SearchOutlined,
   SettingOutlined,
@@ -92,9 +90,9 @@ const navSections: NavSection[] = [
     children: [
       {
         key: 'prompt-safety',
-        label: '提示词安全防护',
+        label: '内容安全检测',
         path: '/ai-compliance/prompt-safety',
-        breadcrumbs: ['AI合规', '提示词安全防护'],
+        breadcrumbs: ['AI合规', '内容安全检测'],
       },
       {
         key: 'code-safety',
@@ -115,12 +113,6 @@ const navSections: NavSection[] = [
         breadcrumbs: ['AI合规', '推理时安全引导'],
       },
       {
-        key: 'content-tagging',
-        label: '内容分类与标签',
-        path: '/ai-compliance/content-tagging',
-        breadcrumbs: ['AI合规', '内容分类与标签'],
-      },
-      {
         key: 'rag-guard',
         label: 'RAG防护',
         path: '/ai-compliance/rag-guard',
@@ -131,6 +123,12 @@ const navSections: NavSection[] = [
         label: 'MCP防护',
         path: '/ai-compliance/mcp-guard',
         breadcrumbs: ['AI合规', 'MCP防护'],
+      },
+      {
+        key: 'a2a-guard',
+        label: 'A2A防护',
+        path: '/ai-compliance/a2a-guard',
+        breadcrumbs: ['AI合规', 'A2A防护'],
       },
     ],
   },
@@ -152,9 +150,9 @@ const navSections: NavSection[] = [
 
 const defaultTarget: NavTarget = {
   sectionKey: 'ai-compliance',
-  label: '提示词安全防护',
+  label: '内容安全检测',
   path: '/ai-compliance/prompt-safety',
-  breadcrumbs: ['AI合规', '提示词安全防护'],
+  breadcrumbs: ['AI合规', '内容安全检测'],
   isChild: true,
 };
 
