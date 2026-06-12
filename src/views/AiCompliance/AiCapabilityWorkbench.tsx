@@ -1447,7 +1447,7 @@ function CodeSafetyConfigForm(props: { module: CapabilityModule }) {
 
   return (
     <div className="config-shell">
-      <section className="config-pane config-pane--ink">
+      <section className="config-pane config-pane--slate">
         <div className="config-pane__title">代码安全检测配置</div>
         <div className="config-pane__desc">用更贴近研发工程的方式配置扫描范围、触发阶段和规则族。</div>
 
