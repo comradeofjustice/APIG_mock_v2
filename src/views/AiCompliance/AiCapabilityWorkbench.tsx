@@ -208,73 +208,130 @@ function PromptSafetyConfigForm(props: {
   const strategyOptions = ['越狱攻击', '提示注入', '角色重写', '隐藏指令套取', '多轮试探'];
 
   return (
-    <div className="strategy-form">
-      <section className="strategy-section">
-        <div className="strategy-section__title">动态差异化防护策略</div>
+    <div className="config-shell config-shell--split">
+      <section className="config-pane config-pane--blue">
+        <div className="config-pane__eyebrow">基础信息</div>
+        <div className="config-pane__title">内容安全检测策略</div>
+        <div className="config-pane__desc">以服务接入、告警等级和处置动作构成真实可配置的策略表单。</div>
 
-        <div className="strategy-field-grid">
-          <div className="strategy-field is-span-2">
-            <div className="strategy-field__label">模式选择</div>
-            <div className="strategy-field__control">
-              <Radio.Group value={mode} className="strategy-radio-group" onChange={(event) => onModeChange(event.target.value)}>
-                <Radio.Button value="平衡模式">平衡模式</Radio.Button>
-                <Radio.Button value="严格模式">严格模式</Radio.Button>
+        <div className="config-pane__body">
+          <div className="config-field">
+            <div className="config-field__label">策略名称</div>
+            <Input defaultValue="内容安全主策略" placeholder="请输入策略名称" />
+          </div>
+
+          <div className="config-field">
+            <div className="config-field__label">策略描述</div>
+            <TextArea
+              defaultValue="对问、推理、答链路执行统一内容检测，并根据业务风险切换差异化防护强度。"
+              autoSize={{ minRows: 4, maxRows: 6 }}
+            />
+          </div>
+
+          <div className="config-pane__row">
+            <div className="config-field">
+              <div className="config-field__label">服务名称</div>
+              <Select defaultValue="智能问答助手">
+                <Select.Option value="智能问答助手">智能问答助手</Select.Option>
+                <Select.Option value="知识库助手">知识库助手</Select.Option>
+                <Select.Option value="客服坐席助手">客服坐席助手</Select.Option>
+              </Select>
+            </div>
+
+            <div className="config-field">
+              <div className="config-field__label">启用状态</div>
+              <div className="strategy-switch">
+                <Switch defaultChecked />
+                <span className="strategy-switch__text">运行中</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="config-pane__row">
+            <div className="config-field">
+              <div className="config-field__label">告警等级</div>
+              <Radio.Group defaultValue="警告" className="strategy-radio-group">
+                <Radio.Button value="警告">警告</Radio.Button>
+                <Radio.Button value="重要">重要</Radio.Button>
+                <Radio.Button value="严重">严重</Radio.Button>
               </Radio.Group>
             </div>
-            <div className="strategy-field__helper">平衡模式兼顾正常问答与风险收敛，严格模式优先阻断越狱和注入类输入。</div>
-          </div>
-        </div>
-      </section>
 
-      <section className="strategy-section">
-        <div className="strategy-section__title">拦截策略</div>
-
-        <div className="strategy-field-grid">
-          <div className="strategy-field is-span-2">
-            <div className="strategy-field__label">启用项</div>
-            <div className="strategy-field__control">
-              <Checkbox.Group
-                className="strategy-checkbox-group"
-                options={strategyOptions}
-                value={selectedStrategies}
-                onChange={(values) => onStrategyChange(values as string[])}
-              />
+            <div className="config-field">
+              <div className="config-field__label">动作配置</div>
+              <Radio.Group defaultValue="安全代答" className="strategy-radio-group">
+                <Radio.Button value="仅告警">仅告警</Radio.Button>
+                <Radio.Button value="告警并阻断">告警并阻断</Radio.Button>
+                <Radio.Button value="安全代答">安全代答</Radio.Button>
+              </Radio.Group>
             </div>
-            <div className="strategy-field__helper">勾选当前会话需要启用的提示词拦截策略，用于识别越狱、注入、角色重写和隐藏指令套取。</div>
+          </div>
+
+          <div className="config-field">
+            <div className="config-field__label">拒绝描述信息</div>
+            <TextArea
+              defaultValue="非常抱歉，当前请求触发了内容安全策略，系统仅保留公开帮助信息，不返回内部规则和危险步骤。"
+              autoSize={{ minRows: 3, maxRows: 5 }}
+            />
           </div>
         </div>
       </section>
 
-      <section className="strategy-section">
-        <div className="strategy-section__title">意图分析</div>
+      <section className="config-pane config-pane--slate">
+        <div className="config-pane__eyebrow">规则条件</div>
+        <div className="config-pane__title">动态差异化防护策略</div>
+        <div className="config-pane__desc">按链路阶段、识别策略和用户画像共同决定最终的检测强度。</div>
 
-        <div className="strategy-field-grid">
-          <div className="strategy-field is-span-2">
-            <div className="strategy-field__label">分析开关</div>
-            <div className="strategy-field__control">
+        <div className="config-pane__body">
+          <div className="config-field">
+            <div className="config-field__label">检测范围</div>
+            <Checkbox.Group className="strategy-checkbox-group" options={['问', '推理', '答']} defaultValue={['问']} />
+          </div>
+
+          <div className="config-pane__row">
+            <div className="config-field-card">
+              <div className="config-field__label">多模态检测</div>
+              <div className="strategy-switch">
+                <Switch />
+                <span className="strategy-switch__text">关闭</span>
+              </div>
+            </div>
+
+            <div className="config-field-card">
+              <div className="config-field__label">意图识别</div>
               <div className="strategy-switch">
                 <Switch checked={intentAnalysisEnabled} onChange={onIntentAnalysisChange} />
-                <span className="strategy-switch__text">{intentAnalysisEnabled ? '已开启' : '已关闭'}</span>
+                <span className="strategy-switch__text">{intentAnalysisEnabled ? '开启' : '关闭'}</span>
               </div>
             </div>
-            <div className="strategy-field__helper">开启后对显式问题和真实目标做偏差分析，用于识别隐藏恶意意图和规避行为。</div>
           </div>
-        </div>
-      </section>
 
-      <section className="strategy-section">
-        <div className="strategy-section__title">用户画像规则</div>
+          <div className="config-field">
+            <div className="config-field__label">检测模式</div>
+            <Radio.Group value={mode} className="strategy-radio-group" onChange={(event) => onModeChange(event.target.value)}>
+              <Radio.Button value="平衡模式">平衡模式</Radio.Button>
+              <Radio.Button value="严格模式">严格模式</Radio.Button>
+            </Radio.Group>
+            <div className="config-field__hint">平衡模式兼顾正常问答与风险收敛，严格模式优先阻断越狱和注入类输入。</div>
+          </div>
 
-        <div className="strategy-field-grid">
-          <div className="strategy-field is-span-2">
-            <div className="strategy-field__label">基于用户行为画像构建规则</div>
-            <div className="strategy-field__control">
-              <div className="strategy-switch">
-                <Switch checked={userProfileEnabled} onChange={onUserProfileChange} />
-                <span className="strategy-switch__text">{userProfileEnabled ? '已开启' : '已关闭'}</span>
-              </div>
+          <div className="config-field">
+            <div className="config-field__label">拦截策略</div>
+            <Checkbox.Group
+              className="strategy-checkbox-group"
+              options={strategyOptions}
+              value={selectedStrategies}
+              onChange={(values) => onStrategyChange(values as string[])}
+            />
+          </div>
+
+          <div className="config-field-card">
+            <div className="config-field__label">基于用户行为画像构建规则</div>
+            <div className="strategy-switch">
+              <Switch checked={userProfileEnabled} onChange={onUserProfileChange} />
+              <span className="strategy-switch__text">{userProfileEnabled ? '已开启' : '已关闭'}</span>
             </div>
-            <div className="strategy-field__helper">结合历史行为和交互模式生成用户风险画像，用于匹配差异化防护策略。</div>
+            <div className="config-field__hint">结合历史行为和交互模式生成用户风险画像，用于匹配差异化防护策略。</div>
           </div>
         </div>
       </section>
@@ -404,6 +461,236 @@ function PromptSafetyLiveResult(props: {
   );
 }
 
+function buildMultimodalPayload(module: CapabilityModule) {
+  if (module.samplePreview.type !== 'media') {
+    return '';
+  }
+
+  return `{
+  "task_id": "media-20260612-021",
+  "channel": "campaign-assets",
+  "assets": [
+${module.samplePreview.items
+  .map(
+    (item, index) => `    {
+      "name": "${item.name}",
+      "format": "${item.format}",
+      "source": "${item.source}",
+      "index": ${index + 1}
+    }`
+  )
+  .join(',\n')}
+  ]
+}`;
+}
+
+function MultimodalGuardConfigForm() {
+  return (
+    <div className="config-shell config-shell--mosaic">
+      <section className="config-pane config-pane--blue">
+        <div className="config-pane__eyebrow">素材接入</div>
+        <div className="config-pane__title">审核任务定义</div>
+        <div className="config-pane__desc">定义接入来源、审核对象和基础审查模式。</div>
+
+        <div className="config-pane__body">
+          <div className="config-pane__row">
+            <div className="config-field">
+              <div className="config-field__label">策略名称</div>
+              <Input defaultValue="多模态审核主策略" />
+            </div>
+            <div className="config-field">
+              <div className="config-field__label">接入场景</div>
+              <Select defaultValue="活动中心素材审核">
+                <Select.Option value="活动中心素材审核">活动中心素材审核</Select.Option>
+                <Select.Option value="用户上传内容审核">用户上传内容审核</Select.Option>
+                <Select.Option value="AIGC 生成内容复检">AIGC 生成内容复检</Select.Option>
+              </Select>
+            </div>
+          </div>
+
+          <div className="config-field">
+            <div className="config-field__label">检测对象</div>
+            <Checkbox.Group
+              className="strategy-checkbox-group"
+              defaultValue={['用户上传图像', '模型生成图像', '宣传短视频']}
+              options={['用户上传图像', '模型生成图像', '宣传短视频', '外链回传素材']}
+            />
+          </div>
+
+          <div className="config-pane__row">
+            <div className="config-field-card">
+              <div className="config-field__label">OCR 联合判定</div>
+              <div className="strategy-switch">
+                <Switch defaultChecked />
+                <span className="strategy-switch__text">已开启</span>
+              </div>
+            </div>
+            <div className="config-field-card">
+              <div className="config-field__label">生成内容复检</div>
+              <div className="strategy-switch">
+                <Switch defaultChecked />
+                <span className="strategy-switch__text">已开启</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="config-pane config-pane--sage">
+        <div className="config-pane__eyebrow">图像规则</div>
+        <div className="config-pane__title">图像内容检测</div>
+        <div className="config-pane__desc">对图像中的不当、有害和敏感元素做重点审查。</div>
+
+        <div className="config-pane__body">
+          <div className="config-field">
+            <div className="config-field__label">重点内容类型</div>
+            <Checkbox.Group
+              className="strategy-checkbox-group"
+              defaultValue={['有害器械', '敏感标识', '涉政文字']}
+              options={['不当姿态', '有害器械', '敏感标识', '涉政文字', '血腥暴力']}
+            />
+          </div>
+
+          <div className="config-pane__row">
+            <div className="config-field">
+              <div className="config-field__label">高危动作</div>
+              <Select defaultValue="阻断下发">
+                <Select.Option value="阻断下发">阻断下发</Select.Option>
+                <Select.Option value="自动下架">自动下架</Select.Option>
+                <Select.Option value="仅运营告警">仅运营告警</Select.Option>
+              </Select>
+            </div>
+            <div className="config-field">
+              <div className="config-field__label">灰区处理</div>
+              <Select defaultValue="转人工复核">
+                <Select.Option value="转人工复核">转人工复核</Select.Option>
+                <Select.Option value="加水印放行">加水印放行</Select.Option>
+                <Select.Option value="二次抽帧">二次抽帧</Select.Option>
+              </Select>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="config-pane config-pane--slate config-pane--full">
+        <div className="config-pane__eyebrow">审核联动</div>
+        <div className="config-pane__title">通知与审计</div>
+        <div className="config-pane__desc">控制通知对象、审计去向和素材归档方式。</div>
+
+        <div className="config-pane__body">
+          <div className="config-pane__row">
+            <div className="config-field">
+              <div className="config-field__label">素材来源</div>
+              <Input defaultValue="活动中心 / 商品审核 / AI 制图" />
+            </div>
+            <div className="config-field">
+              <div className="config-field__label">证据仓</div>
+              <Input defaultValue="oss://audit-media-bucket/review/" />
+            </div>
+          </div>
+
+          <div className="config-field">
+            <div className="config-field__label">通知对象</div>
+            <TextArea defaultValue="内容审核员、安全运营、活动负责人" autoSize={{ minRows: 2, maxRows: 4 }} />
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function MultimodalGuardLiveResult(props: { module: CapabilityModule }) {
+  const { module } = props;
+  const [draftPayload, setDraftPayload] = useState(() => buildMultimodalPayload(module));
+  const [lastValidatedAt, setLastValidatedAt] = useState(() => formatValidationTime(new Date()));
+  const [validationCount, setValidationCount] = useState(1);
+  const firstResult = module.detectionTable.rows[0];
+
+  const handleValidate = () => {
+    setLastValidatedAt(formatValidationTime(new Date()));
+    setValidationCount((count) => count + 1);
+  };
+
+  const handleLoadExample = () => {
+    setDraftPayload(buildMultimodalPayload(module));
+  };
+
+  return (
+    <div className="code-live-layout">
+      <section className="code-live-panel">
+        <div className="code-live-panel__head">
+          <div>
+            <div className="code-live-panel__title">在线验证</div>
+            <div className="code-live-panel__subtitle">输入图像和视频审核任务，验证当前多模态规则对素材的识别与处置结果。</div>
+          </div>
+          <div className="code-live-panel__meta">最近验证：{lastValidatedAt}</div>
+        </div>
+
+        <div className="code-live-editor">
+          <TextArea
+            value={draftPayload}
+            onChange={(event) => setDraftPayload(event.target.value)}
+            autoSize={{ minRows: 14, maxRows: 17 }}
+          />
+        </div>
+
+        <div className="code-live-toolbar">
+          <div className="code-live-toolbar__scope">
+            <span className="code-live-toolbar__label">审核对象</span>
+            <Tag>图像</Tag>
+            <Tag>视频</Tag>
+            <Tag>OCR</Tag>
+          </div>
+
+          <div className="code-live-toolbar__actions">
+            <Button onClick={handleLoadExample}>载入示例</Button>
+            <Button type="primary" onClick={handleValidate}>
+              开始验证
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <section className="code-live-panel">
+        <div className="code-live-panel__head">
+          <div>
+            <div className="code-live-panel__title">在线测试结果</div>
+            <div className="code-live-panel__subtitle">返回图像命中、异常帧数量和最终审核动作。</div>
+          </div>
+          <div className="code-live-panel__meta">第 {validationCount} 次验证</div>
+        </div>
+
+        <div className="live-result-bar">
+          <div className="live-result-chip">
+            <span>图像命中</span>
+            <strong>{module.outputCards[0]?.value ?? '2 类'}</strong>
+          </div>
+          <div className="live-result-chip">
+            <span>异常帧</span>
+            <strong>{module.outputCards[1]?.value ?? '3 帧'}</strong>
+          </div>
+          <div className="live-result-chip">
+            <span>审核结论</span>
+            <strong>{module.outputCards[2]?.value ?? '阻断 + 复核'}</strong>
+          </div>
+        </div>
+
+        <div className={`live-result-card ${getToneClassName(firstResult?.tone)}`}>
+          <div className="live-result-card__title">本次判定</div>
+          <div className="live-result-grid">
+            <span>资源对象</span>
+            <strong>{firstResult?.cells[0] ?? '618_活动海报_v3.png'}</strong>
+            <span>命中标签</span>
+            <strong>{firstResult?.cells[1] ?? '有害器械 / 敏感文字'}</strong>
+            <span>审核动作</span>
+            <strong>{firstResult?.cells[2] ?? '阻断并下架'}</strong>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 function RagGuardConfigForm(props: {
   selectedStrategies: string[];
   onStrategyChange: (values: string[]) => void;
@@ -413,23 +700,52 @@ function RagGuardConfigForm(props: {
   const strategyOptions = ['Chunk 注入识别', '越权检索意图', '未授权来源校验', '附件链接回传拦截'];
 
   return (
-    <div className="strategy-form">
-      <section className="strategy-section">
-        <div className="strategy-section__title">检测策略</div>
+    <div className="config-shell config-shell--split">
+      <section className="config-pane config-pane--sand">
+        <div className="config-pane__eyebrow">查询接入</div>
+        <div className="config-pane__title">检索任务配置</div>
+        <div className="config-pane__desc">配置检索服务、召回方式和授权知识源边界。</div>
 
-        <div className="strategy-field-grid">
-          <div className="strategy-field is-span-2">
-            <div className="strategy-field__label">启用项</div>
-            <div className="strategy-field__control">
-              <Checkbox.Group
-                className="strategy-checkbox-group"
-                options={strategyOptions}
-                value={selectedStrategies}
-                onChange={(values) => onStrategyChange(values as string[])}
-              />
+        <div className="config-pane__body">
+          <div className="config-pane__row">
+            <div className="config-field">
+              <div className="config-field__label">策略名称</div>
+              <Input defaultValue="RAG 检索防护主策略" />
             </div>
-            <div className="strategy-field__helper">保留少量核心策略，用于演示 RAG 查询、召回结果和来源污染的联动检测。</div>
+            <div className="config-field">
+              <div className="config-field__label">接入服务</div>
+              <Select defaultValue="知识助手检索">
+                <Select.Option value="知识助手检索">知识助手检索</Select.Option>
+                <Select.Option value="客服知识问答">客服知识问答</Select.Option>
+                <Select.Option value="制度资料检索">制度资料检索</Select.Option>
+              </Select>
+            </div>
           </div>
+
+          <div className="config-field">
+            <div className="config-field__label">授权知识源</div>
+            <TextArea defaultValue="制度知识库、工单知识库、已授权客户 FAQ" autoSize={{ minRows: 2, maxRows: 4 }} />
+          </div>
+
+        </div>
+      </section>
+
+      <section className="config-pane config-pane--sage">
+        <div className="config-pane__eyebrow">风险判定</div>
+        <div className="config-pane__title">越权识别策略</div>
+        <div className="config-pane__desc">对查询意图、结果来源和附件回传做联合防护。</div>
+
+        <div className="config-pane__body">
+          <div className="config-field">
+            <div className="config-field__label">启用策略</div>
+            <Checkbox.Group
+              className="strategy-checkbox-group"
+              options={strategyOptions}
+              value={selectedStrategies}
+              onChange={(values) => onStrategyChange(values as string[])}
+            />
+          </div>
+
         </div>
       </section>
     </div>
@@ -460,7 +776,6 @@ function RagGuardLiveResult(props: {
   const [validationCount, setValidationCount] = useState(1);
 
   const firstResult = module.detectionTable.rows[0];
-  const safeReply = module.structuredOutputs[0]?.content ?? '';
 
   const handleValidate = () => {
     setLastValidatedAt(formatValidationTime(new Date()));
@@ -511,20 +826,12 @@ function RagGuardLiveResult(props: {
         <div className="code-live-panel__head">
           <div>
             <div className="code-live-panel__title">在线测试结果</div>
-            <div className="code-live-panel__subtitle">返回检索意图、来源状态和最终处置动作。</div>
+            <div className="code-live-panel__subtitle">返回当前检索请求的处置结果和安全回复。</div>
           </div>
           <div className="code-live-panel__meta">第 {validationCount} 次验证</div>
         </div>
 
         <div className="live-result-bar">
-          <div className="live-result-chip">
-            <span>检索意图</span>
-            <strong>{module.outputCards[0]?.value ?? '越权获取'}</strong>
-          </div>
-          <div className="live-result-chip">
-            <span>来源状态</span>
-            <strong>{module.outputCards[1]?.value ?? '2 / 3'}</strong>
-          </div>
           <div className="live-result-chip">
             <span>处置动作</span>
             <strong>{module.outputCards[3]?.value ?? '拦截并记录'}</strong>
@@ -542,11 +849,6 @@ function RagGuardLiveResult(props: {
             <strong>{firstResult?.cells[3] ?? '未授权'}</strong>
           </div>
         </div>
-
-        <div className="code-live-response">
-          <div className="code-live-response__title">安全检索回复</div>
-          <div className="code-live-response__body">{safeReply}</div>
-        </div>
       </section>
     </div>
   );
@@ -561,22 +863,95 @@ function McpGuardConfigForm(props: {
   const strategyOptions = ['恶意指令', '注入攻击', '漏洞利用', '协议绕过', '上下文污染'];
 
   return (
-    <div className="strategy-form">
-      <section className="strategy-section">
-        <div className="strategy-section__title">拦截策略</div>
+    <div className="config-shell config-shell--three">
+      <section className="config-pane config-pane--slate">
+        <div className="config-pane__eyebrow">消息接入</div>
+        <div className="config-pane__title">MCP 请求检测</div>
+        <div className="config-pane__desc">定义消息来源、协议版本和重点字段。</div>
 
-        <div className="strategy-field-grid">
-          <div className="strategy-field is-span-2">
-            <div className="strategy-field__label">启用项</div>
-            <div className="strategy-field__control">
-              <Checkbox.Group
-                className="strategy-checkbox-group"
-                options={strategyOptions}
-                value={selectedStrategies}
-                onChange={(values) => onStrategyChange(values as string[])}
-              />
+        <div className="config-pane__body">
+          <div className="config-field">
+            <div className="config-field__label">接入 Agent</div>
+            <Select defaultValue="ops-assistant">
+              <Select.Option value="ops-assistant">ops-assistant</Select.Option>
+              <Select.Option value="knowledge-agent">knowledge-agent</Select.Option>
+              <Select.Option value="workflow-orchestrator">workflow-orchestrator</Select.Option>
+            </Select>
+          </div>
+          <div className="config-field">
+            <div className="config-field__label">协议版本</div>
+            <Radio.Group defaultValue="MCP v1.0" className="strategy-radio-group">
+              <Radio.Button value="MCP v1.0">MCP v1.0</Radio.Button>
+              <Radio.Button value="MCP v1.1">MCP v1.1</Radio.Button>
+            </Radio.Group>
+          </div>
+          <div className="config-field">
+            <div className="config-field__label">启用策略</div>
+            <Checkbox.Group
+              className="strategy-checkbox-group"
+              options={strategyOptions}
+              value={selectedStrategies}
+              onChange={(values) => onStrategyChange(values as string[])}
+            />
+          </div>
+        </div>
+      </section>
+
+      <section className="config-pane config-pane--rose">
+        <div className="config-pane__eyebrow">协议控制</div>
+        <div className="config-pane__title">结构与阈值</div>
+        <div className="config-pane__desc">先做协议结构校验，再进入语义风险研判。</div>
+
+        <div className="config-pane__body">
+          <div className="config-field-card">
+            <div className="config-field__label">结构校验</div>
+            <div className="strategy-switch">
+              <Switch defaultChecked />
+              <span className="strategy-switch__text">已开启</span>
             </div>
-            <div className="strategy-field__helper">保留消息内容检测的核心策略，用于演示 MCP 请求在指令、参数与上下文层面的联动拦截。</div>
+          </div>
+          <div className="config-field">
+            <div className="config-field__label">风险阈值</div>
+            <div className="strategy-slider">
+              <Slider defaultValue={78} min={40} max={100} tooltipVisible={false} />
+              <span className="strategy-slider__value">78%</span>
+            </div>
+          </div>
+          <div className="config-field">
+            <div className="config-field__label">高危模板</div>
+            <Select defaultValue="恶意指令 + 协议利用">
+              <Select.Option value="恶意指令 + 协议利用">恶意指令 + 协议利用</Select.Option>
+              <Select.Option value="仅指令注入">仅指令注入</Select.Option>
+              <Select.Option value="仅协议绕过">仅协议绕过</Select.Option>
+            </Select>
+          </div>
+        </div>
+      </section>
+
+      <section className="config-pane config-pane--sage">
+        <div className="config-pane__eyebrow">上下文净化</div>
+        <div className="config-pane__title">污染回滚策略</div>
+        <div className="config-pane__desc">对共享记忆和工具返回做清洗、回滚和隔离。</div>
+
+        <div className="config-pane__body">
+          <div className="config-field-card">
+            <div className="config-field__label">上下文安全检测</div>
+            <div className="strategy-switch">
+              <Switch defaultChecked />
+              <span className="strategy-switch__text">已开启</span>
+            </div>
+          </div>
+          <div className="config-field">
+            <div className="config-field__label">污染处置</div>
+            <Select defaultValue="清洗 + 回滚">
+              <Select.Option value="清洗 + 回滚">清洗 + 回滚</Select.Option>
+              <Select.Option value="仅清洗">仅清洗</Select.Option>
+              <Select.Option value="直接隔离会话">直接隔离会话</Select.Option>
+            </Select>
+          </div>
+          <div className="config-field">
+            <div className="config-field__label">隔离队列</div>
+            <Input defaultValue="mcp-quarantine" />
           </div>
         </div>
       </section>
@@ -718,14 +1093,61 @@ function A2aGuardConfigForm(props: {
   const strategyOptions = ['恶意指令', '注入攻击', '漏洞利用', '敏感数据外泄', '调用链篡改'];
 
   return (
-    <div className="strategy-form">
-      <section className="strategy-section">
-        <div className="strategy-section__title">拦截策略</div>
+    <div className="config-shell">
+      <section className="config-pane config-pane--blue">
+        <div className="config-pane__eyebrow">链路信息</div>
+        <div className="config-pane__title">A2A 通信接入</div>
+        <div className="config-pane__desc">定义发送方、接收方和任务链路的基本约束。</div>
 
-        <div className="strategy-field-grid">
-          <div className="strategy-field is-span-2">
-            <div className="strategy-field__label">启用项</div>
-            <div className="strategy-field__control">
+        <div className="config-pane__body">
+          <div className="config-pane__row">
+            <div className="config-field">
+              <div className="config-field__label">发送方 Agent</div>
+              <Select defaultValue="agent.scheduler">
+                <Select.Option value="agent.scheduler">agent.scheduler</Select.Option>
+                <Select.Option value="agent.ops-gateway">agent.ops-gateway</Select.Option>
+                <Select.Option value="agent.orchestrator">agent.orchestrator</Select.Option>
+              </Select>
+            </div>
+            <div className="config-field">
+              <div className="config-field__label">接收方 Agent</div>
+              <Select defaultValue="agent.db-executor">
+                <Select.Option value="agent.db-executor">agent.db-executor</Select.Option>
+                <Select.Option value="agent.knowledge-worker">agent.knowledge-worker</Select.Option>
+                <Select.Option value="agent.delivery-worker">agent.delivery-worker</Select.Option>
+              </Select>
+            </div>
+          </div>
+
+          <div className="config-pane__row">
+            <div className="config-field">
+              <div className="config-field__label">任务类型</div>
+              <Select defaultValue="customer-incident-triage">
+                <Select.Option value="customer-incident-triage">customer-incident-triage</Select.Option>
+                <Select.Option value="knowledge-retrieval">knowledge-retrieval</Select.Option>
+                <Select.Option value="bulk-export">bulk-export</Select.Option>
+              </Select>
+            </div>
+            <div className="config-field-card">
+              <div className="config-field__label">端到端加密</div>
+              <div className="strategy-switch">
+                <Switch defaultChecked />
+                <span className="strategy-switch__text">已开启</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="config-shell config-shell--split">
+        <section className="config-pane config-pane--rose">
+          <div className="config-pane__eyebrow">风险识别</div>
+          <div className="config-pane__title">通信内容检测</div>
+          <div className="config-pane__desc">识别恶意指令、数据外泄和调用链篡改。</div>
+
+          <div className="config-pane__body">
+            <div className="config-field">
+              <div className="config-field__label">启用策略</div>
               <Checkbox.Group
                 className="strategy-checkbox-group"
                 options={strategyOptions}
@@ -733,10 +1155,44 @@ function A2aGuardConfigForm(props: {
                 onChange={(values) => onStrategyChange(values as string[])}
               />
             </div>
-            <div className="strategy-field__helper">针对 Agent 到 Agent 的通信内容启用核心检测策略，用于识别危险消息和异常调用链。</div>
+            <div className="config-field">
+              <div className="config-field__label">检测范围</div>
+              <Radio.Group defaultValue="消息体 + 上下文" className="strategy-radio-group">
+                <Radio.Button value="仅消息体">仅消息体</Radio.Button>
+                <Radio.Button value="消息体 + 上下文">消息体 + 上下文</Radio.Button>
+              </Radio.Group>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        <section className="config-pane config-pane--slate">
+          <div className="config-pane__eyebrow">联动动作</div>
+          <div className="config-pane__title">处置与告警</div>
+          <div className="config-pane__desc">根据风险等级执行拦截、隔离和审计联动。</div>
+
+          <div className="config-pane__body">
+            <div className="config-field">
+              <div className="config-field__label">高危动作</div>
+              <Select defaultValue="拦截通信">
+                <Select.Option value="拦截通信">拦截通信</Select.Option>
+                <Select.Option value="隔离复核">隔离复核</Select.Option>
+                <Select.Option value="降级放行">降级放行</Select.Option>
+              </Select>
+            </div>
+            <div className="config-field-card">
+              <div className="config-field__label">调用链完整性校验</div>
+              <div className="strategy-switch">
+                <Switch defaultChecked />
+                <span className="strategy-switch__text">已开启</span>
+              </div>
+            </div>
+            <div className="config-field">
+              <div className="config-field__label">告警对象</div>
+              <TextArea defaultValue="A2A 平台管理员、安全运营、业务负责人" autoSize={{ minRows: 2, maxRows: 4 }} />
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
@@ -879,72 +1335,99 @@ function SafeSteerConfigForm(props: {
   const hardReplyField = findField(module, '代答内容');
 
   return (
-    <div className="strategy-form">
-      <section className="strategy-section">
-        <div className="strategy-section__title">Steer 核心</div>
+    <div className="config-shell">
+      <section className="config-pane config-pane--rose">
+        <div className="config-pane__eyebrow">Steer 核心</div>
+        <div className="config-pane__title">推理干预工作台</div>
+        <div className="config-pane__desc">用不同干预模式和场景模板控制模型在推理过程中的输出轨迹。</div>
 
-        <div className="strategy-field-grid">
-          {dynamicRuleField ? (
-            <div className="strategy-field">
-              <div className="strategy-field__label">{dynamicRuleField.label}</div>
-              <div className="strategy-field__control">{renderField(dynamicRuleField)}</div>
-              {dynamicRuleField.helper ? <div className="strategy-field__helper">{dynamicRuleField.helper}</div> : null}
+        <div className="config-pane__body">
+          <div className="config-pane__row">
+            <div className="config-field">
+              <div className="config-field__label">场景模板</div>
+              <Select defaultValue="客服运维问答">
+                <Select.Option value="客服运维问答">客服运维问答</Select.Option>
+                <Select.Option value="安全专家辅助">安全专家辅助</Select.Option>
+                <Select.Option value="知识助手答复">知识助手答复</Select.Option>
+              </Select>
+            </div>
+
+            <div className="config-field-card">
+              <div className="config-field__label">自动决策</div>
+              <div className="strategy-switch">
+                <Switch defaultChecked />
+                <span className="strategy-switch__text">已开启</span>
+              </div>
+            </div>
+          </div>
+
+          {dynamicRuleField?.kind === 'switch' ? (
+            <div className="config-field-card">
+              <div className="config-field__label">{dynamicRuleField.label}</div>
+              <div className="strategy-switch">
+                <Switch defaultChecked={dynamicRuleField.checked} />
+                <span className="strategy-switch__text">{dynamicRuleField.checkedLabel ?? '已开启'}</span>
+              </div>
             </div>
           ) : null}
 
-          <div className="strategy-field is-span-2">
-            <div className="strategy-field__label">干预模式</div>
-            <div className="strategy-field__control">
-              <Radio.Group value={mode} className="strategy-radio-group" onChange={(event) => onModeChange(event.target.value)}>
-                <Radio.Button value="弹性校准">弹性校准</Radio.Button>
-                <Radio.Button value="硬性代答">硬性代答</Radio.Button>
-              </Radio.Group>
-            </div>
-            <div className="strategy-field__helper">弹性校准用于安全收敛回复，硬性代答用于直接输出预设安全内容。</div>
+          <div className="config-field">
+            <div className="config-field__label">干预模式</div>
+            <Radio.Group value={mode} className="strategy-radio-group" onChange={(event) => onModeChange(event.target.value)}>
+              <Radio.Button value="弹性校准">弹性校准</Radio.Button>
+              <Radio.Button value="硬性代答">硬性代答</Radio.Button>
+            </Radio.Group>
+            <div className="config-field__hint">弹性校准用于安全收敛回复，硬性代答用于直接输出预设安全内容。</div>
           </div>
         </div>
       </section>
 
       {mode === '弹性校准' ? (
-        <section className="strategy-section">
-          <div className="strategy-section__title">改写策略</div>
+        <section className="config-pane config-pane--violet">
+          <div className="config-pane__eyebrow">改写策略</div>
+          <div className="config-pane__title">弹性校准配置</div>
+          <div className="config-pane__desc">对风险回答执行边界收紧和安全改写。</div>
 
-          <div className="strategy-field-grid">
-            {rewritePolicyField ? (
-              <div className="strategy-field">
-                <div className="strategy-field__label">{rewritePolicyField.label}</div>
-                <div className="strategy-field__control">{renderField(rewritePolicyField)}</div>
-                {rewritePolicyField.helper ? <div className="strategy-field__helper">{rewritePolicyField.helper}</div> : null}
-              </div>
-            ) : null}
+          <div className="config-pane__body">
+            <div className="config-pane__row">
+              {rewritePolicyField ? (
+                <div className="config-field">
+                  <div className="config-field__label">{rewritePolicyField.label}</div>
+                  <div className="config-field__control">{renderField(rewritePolicyField)}</div>
+                  {rewritePolicyField.helper ? <div className="config-field__hint">{rewritePolicyField.helper}</div> : null}
+                </div>
+              ) : null}
 
-            {outputBoundaryField ? (
-              <div className="strategy-field">
-                <div className="strategy-field__label">{outputBoundaryField.label}</div>
-                <div className="strategy-field__control">{renderField(outputBoundaryField)}</div>
-                {outputBoundaryField.helper ? <div className="strategy-field__helper">{outputBoundaryField.helper}</div> : null}
-              </div>
-            ) : null}
+              {outputBoundaryField ? (
+                <div className="config-field">
+                  <div className="config-field__label">{outputBoundaryField.label}</div>
+                  <div className="config-field__control">{renderField(outputBoundaryField)}</div>
+                  {outputBoundaryField.helper ? <div className="config-field__hint">{outputBoundaryField.helper}</div> : null}
+                </div>
+              ) : null}
+            </div>
 
             {safePromptField ? (
-              <div className="strategy-field is-span-2">
-                <div className="strategy-field__label">{safePromptField.label}</div>
-                <div className="strategy-field__control">{renderField(safePromptField)}</div>
-                {safePromptField.helper ? <div className="strategy-field__helper">{safePromptField.helper}</div> : null}
+              <div className="config-field">
+                <div className="config-field__label">{safePromptField.label}</div>
+                <div className="config-field__control">{renderField(safePromptField)}</div>
+                {safePromptField.helper ? <div className="config-field__hint">{safePromptField.helper}</div> : null}
               </div>
             ) : null}
           </div>
         </section>
       ) : (
-        <section className="strategy-section">
-          <div className="strategy-section__title">硬性代答内容</div>
+        <section className="config-pane config-pane--slate">
+          <div className="config-pane__eyebrow">代答模板</div>
+          <div className="config-pane__title">硬性代答配置</div>
+          <div className="config-pane__desc">高危场景直接输出受控回复，不再继续生成原始回答。</div>
 
-          <div className="strategy-field-grid">
+          <div className="config-pane__body">
             {hardReplyField ? (
-              <div className="strategy-field is-span-2">
-                <div className="strategy-field__label">{hardReplyField.label}</div>
-                <div className="strategy-field__control">{renderField(hardReplyField)}</div>
-                {hardReplyField.helper ? <div className="strategy-field__helper">{hardReplyField.helper}</div> : null}
+              <div className="config-field">
+                <div className="config-field__label">{hardReplyField.label}</div>
+                <div className="config-field__control">{renderField(hardReplyField)}</div>
+                {hardReplyField.helper ? <div className="config-field__hint">{hardReplyField.helper}</div> : null}
               </div>
             ) : null}
           </div>
@@ -963,18 +1446,50 @@ function CodeSafetyConfigForm(props: { module: CapabilityModule }) {
   }
 
   return (
-    <div className="strategy-form">
-      <section className="strategy-section">
-        <div className="strategy-section__title">{scanSection.title}</div>
+    <div className="config-shell">
+      <section className="config-pane config-pane--ink">
+        <div className="config-pane__title">代码安全检测配置</div>
+        <div className="config-pane__desc">用更贴近研发工程的方式配置扫描范围、触发阶段和规则族。</div>
 
-        <div className="strategy-field-grid">
-          {scanSection.fields.map((field) => (
-            <div key={`${scanSection.title}-${field.label}`} className={`strategy-field ${field.span === 2 ? 'is-span-2' : ''}`}>
-              <div className="strategy-field__label">{field.label}</div>
-              <div className="strategy-field__control">{renderField(field)}</div>
-              {field.helper ? <div className="strategy-field__helper">{field.helper}</div> : null}
+        <div className="config-pane__body">
+          <div className="config-pane__row config-pane__row--3">
+            <div className="config-field">
+              <div className="config-field__label">策略名称</div>
+              <Input defaultValue="payment-gateway-code-policy" />
             </div>
-          ))}
+
+            <div className="config-field">
+              <div className="config-field__label">主语言</div>
+              <div className="config-field__control">{renderField(scanSection.fields[0])}</div>
+            </div>
+
+            <div className="config-field">
+              <div className="config-field__label">扫描阶段</div>
+              <Radio.Group defaultValue="生成后立即扫描" className="strategy-radio-group">
+                <Radio.Button value="生成后立即扫描">生成后立即扫描</Radio.Button>
+                <Radio.Button value="提交前扫描">提交前扫描</Radio.Button>
+                <Radio.Button value="发布前扫描">发布前扫描</Radio.Button>
+              </Radio.Group>
+            </div>
+          </div>
+
+          <div className="config-field">
+            <div className="config-field__label">规则族</div>
+            <div className="config-field__control">{renderField(scanSection.fields[1])}</div>
+          </div>
+
+          <div className="config-pane__row">
+            <div className="config-field-card">
+              <div className="config-field__label">生成即扫描</div>
+              <div className="config-field__control">{renderField(scanSection.fields[2])}</div>
+            </div>
+
+            <div className="config-field">
+              <div className="config-field__label">上下文窗口</div>
+              <div className="config-field__control">{renderField(scanSection.fields[3])}</div>
+              <div className="config-field__hint">可根据代码上下文跨度自行调节扫描窗口，用于联动判断危险调用的前后文。</div>
+            </div>
+          </div>
         </div>
       </section>
     </div>
@@ -1226,18 +1741,21 @@ export default function AiCapabilityWorkbench(props: AiCapabilityWorkbenchProps)
   const hideConfigTitle =
     module.key === 'prompt-safety' ||
     module.key === 'code-safety' ||
+    module.key === 'multimodal-guard' ||
     module.key === 'safe-steer' ||
     module.key === 'rag-guard' ||
     module.key === 'mcp-guard' ||
     module.key === 'a2a-guard';
   const usePromptSafetyLiveResult = module.key === 'prompt-safety';
   const useCodeSafetyLiveResult = module.key === 'code-safety';
+  const useMultimodalGuardLiveResult = module.key === 'multimodal-guard';
   const useSafeSteerLiveResult = module.key === 'safe-steer';
   const useRagGuardLiveResult = module.key === 'rag-guard';
   const useMcpGuardLiveResult = module.key === 'mcp-guard';
   const useA2aGuardLiveResult = module.key === 'a2a-guard';
   const usePromptSafetyConfig = module.key === 'prompt-safety';
   const useCodeSafetyConfig = module.key === 'code-safety';
+  const useMultimodalGuardConfig = module.key === 'multimodal-guard';
   const useSafeSteerConfig = module.key === 'safe-steer';
   const useRagGuardConfig = module.key === 'rag-guard';
   const useMcpGuardConfig = module.key === 'mcp-guard';
@@ -1283,6 +1801,8 @@ export default function AiCapabilityWorkbench(props: AiCapabilityWorkbenchProps)
             />
           ) : useCodeSafetyConfig ? (
             <CodeSafetyConfigForm module={module} />
+          ) : useMultimodalGuardConfig ? (
+            <MultimodalGuardConfigForm />
           ) : useSafeSteerConfig ? (
             <SafeSteerConfigForm module={module} mode={safeSteerMode} onModeChange={setSafeSteerMode} />
           ) : useRagGuardConfig ? (
@@ -1339,6 +1859,8 @@ export default function AiCapabilityWorkbench(props: AiCapabilityWorkbenchProps)
             />
           ) : useCodeSafetyLiveResult ? (
             <CodeSafetyLiveResult module={module} />
+          ) : useMultimodalGuardLiveResult ? (
+            <MultimodalGuardLiveResult module={module} />
           ) : useSafeSteerLiveResult ? (
             <SafeSteerLiveResult module={module} mode={safeSteerMode} />
           ) : useRagGuardLiveResult ? (

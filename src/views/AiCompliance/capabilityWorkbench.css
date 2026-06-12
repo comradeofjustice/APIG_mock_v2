@@ -164,6 +164,312 @@
   white-space: nowrap;
 }
 
+.config-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.config-shell--split,
+.config-shell--three,
+.config-shell--mosaic {
+  display: grid;
+  gap: 16px;
+}
+
+.config-shell--split {
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+}
+
+.config-shell--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.config-shell--mosaic {
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+}
+
+.config-pane {
+  position: relative;
+  overflow: hidden;
+  padding: 18px;
+  border: 1px solid rgba(185, 198, 219, 0.7);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 251, 255, 0.94) 100%);
+  box-shadow: 0 10px 28px rgba(36, 58, 102, 0.06);
+}
+
+.config-pane::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, rgba(53, 103, 228, 0.55), rgba(53, 103, 228, 0));
+  pointer-events: none;
+}
+
+.config-pane--blue {
+  background: linear-gradient(180deg, #f6faff 0%, #eef4ff 100%);
+  border-color: #d7e4ff;
+}
+
+.config-pane--slate {
+  background: linear-gradient(180deg, #f7f9fc 0%, #eff3f8 100%);
+  border-color: #dbe4ef;
+}
+
+.config-pane--sage {
+  background: linear-gradient(180deg, #f7fbf8 0%, #eef6f1 100%);
+  border-color: #d7e8dd;
+}
+
+.config-pane--sand {
+  background: linear-gradient(180deg, #fffaf4 0%, #f8f0e4 100%);
+  border-color: #ebddc5;
+}
+
+.config-pane--rose {
+  background: linear-gradient(180deg, #fff8f8 0%, #f9ecef 100%);
+  border-color: #ecd8de;
+}
+
+.config-pane--violet {
+  background: linear-gradient(180deg, #faf7ff 0%, #f2ecfb 100%);
+  border-color: #e1d7f6;
+}
+
+.config-pane--ink {
+  color: #e7eefc;
+  background: linear-gradient(180deg, #213147 0%, #1b283b 100%);
+  border-color: #30486a;
+  box-shadow: 0 14px 32px rgba(24, 37, 62, 0.22);
+}
+
+.config-pane--ink::after {
+  background: linear-gradient(90deg, rgba(134, 173, 255, 0.95), rgba(134, 173, 255, 0));
+}
+
+.config-pane--full {
+  grid-column: 1 / -1;
+}
+
+.config-pane__eyebrow {
+  color: #7a8cab;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.config-pane__title {
+  margin-top: 8px;
+  color: #22314f;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.config-pane__desc {
+  margin-top: 6px;
+  color: #617089;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.config-pane__body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.config-pane__row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.config-pane__row--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.config-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.config-field__label {
+  color: #41516d;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.config-field__hint {
+  color: #7b879c;
+  font-size: 12px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.config-field__control {
+  min-width: 0;
+}
+
+.config-field-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(210, 220, 235, 0.92);
+  border-radius: 12px;
+}
+
+.config-pane--blue .config-field-card {
+  background: rgba(255, 255, 255, 0.76);
+  border-color: rgba(201, 218, 245, 0.95);
+}
+
+.config-pane--sage .config-field-card {
+  background: rgba(255, 255, 255, 0.76);
+  border-color: rgba(199, 220, 205, 0.95);
+}
+
+.config-pane--sand .config-field-card {
+  background: rgba(255, 252, 247, 0.8);
+  border-color: rgba(225, 212, 188, 0.95);
+}
+
+.config-pane--rose .config-field-card {
+  background: rgba(255, 255, 255, 0.76);
+  border-color: rgba(231, 209, 215, 0.95);
+}
+
+.config-pane--violet .config-field-card {
+  background: rgba(255, 255, 255, 0.76);
+  border-color: rgba(220, 209, 244, 0.95);
+}
+
+.config-pane--ink .config-field-card {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(113, 140, 181, 0.28);
+}
+
+.config-pane--ink .config-pane__title,
+.config-pane--ink .config-field__label,
+.config-pane--ink .strategy-switch__text,
+.config-pane--ink .strategy-slider__value,
+.config-pane--ink .live-result-chip strong {
+  color: #edf3ff;
+}
+
+.config-pane--ink .config-pane__eyebrow {
+  color: #9fb5df;
+}
+
+.config-pane--ink .config-pane__desc,
+.config-pane--ink .config-field__hint {
+  color: #a6b4ce;
+}
+
+.config-pane .ant-input,
+.config-pane .ant-input-affix-wrapper,
+.config-pane .ant-select:not(.ant-select-customize-input) .ant-select-selector,
+.config-pane .ant-input-number,
+.config-pane textarea.ant-input {
+  border-radius: 10px;
+  border-color: rgba(188, 203, 224, 0.95);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: none !important;
+}
+
+.config-pane .ant-input,
+.config-pane .ant-input-affix-wrapper,
+.config-pane .ant-select:not(.ant-select-customize-input) .ant-select-selector,
+.config-pane textarea.ant-input {
+  min-height: 40px;
+}
+
+.config-pane .ant-input,
+.config-pane textarea.ant-input {
+  color: #22314f;
+}
+
+.config-pane textarea.ant-input {
+  min-height: 88px;
+}
+
+.config-pane .ant-select-single .ant-select-selector {
+  display: flex;
+  align-items: center;
+}
+
+.config-pane .ant-input-affix-wrapper input.ant-input {
+  min-height: auto;
+  background: transparent;
+}
+
+.config-pane .ant-radio-button-wrapper {
+  min-width: 92px;
+  text-align: center;
+  border-radius: 10px !important;
+}
+
+.config-pane .strategy-checkbox-group {
+  gap: 10px;
+}
+
+.config-pane .strategy-checkbox-group .ant-checkbox-wrapper {
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(215, 225, 238, 0.9);
+  border-radius: 999px;
+}
+
+.config-pane--ink .ant-input,
+.config-pane--ink .ant-input-affix-wrapper,
+.config-pane--ink .ant-select:not(.ant-select-customize-input) .ant-select-selector,
+.config-pane--ink textarea.ant-input {
+  color: #edf3ff;
+  background: rgba(18, 28, 41, 0.5);
+  border-color: rgba(91, 117, 156, 0.7);
+}
+
+.config-pane--ink .ant-input::placeholder,
+.config-pane--ink textarea.ant-input::placeholder {
+  color: #8fa4c8;
+}
+
+.config-pane--ink .ant-select-selection-item,
+.config-pane--ink .ant-select-arrow,
+.config-pane--ink .ant-input-suffix {
+  color: #edf3ff;
+}
+
+.config-pane--ink .ant-radio-button-wrapper {
+  color: #c7d5ee;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(101, 126, 163, 0.82);
+}
+
+.config-pane--ink .ant-radio-button-wrapper-checked {
+  color: #edf3ff;
+  background: rgba(122, 160, 238, 0.24);
+  border-color: rgba(122, 160, 238, 0.72);
+}
+
+.config-pane--ink .strategy-checkbox-group .ant-checkbox-wrapper {
+  color: #d6e2f7;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(101, 126, 163, 0.7);
+}
+
 /* 结构化输出 */
 .structured-output-list {
   display: flex;
@@ -486,6 +792,14 @@
 }
 
 @media (max-width: 900px) {
+  .config-shell--split,
+  .config-shell--three,
+  .config-shell--mosaic,
+  .config-pane__row,
+  .config-pane__row--3 {
+    grid-template-columns: 1fr;
+  }
+
   .strategy-field-grid {
     grid-template-columns: 1fr;
   }
@@ -529,6 +843,11 @@
 @media (max-width: 640px) {
   .capability-card {
     padding: 16px;
+  }
+
+  .config-pane {
+    padding: 16px;
+    border-radius: 12px;
   }
 
   .capability-card__actions {
