@@ -13,7 +13,6 @@ import {
   HomeOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  SafetyCertificateOutlined,
   SearchOutlined,
   SettingOutlined,
   UserOutlined,
@@ -79,56 +78,55 @@ const navSections: NavSection[] = [
   {
     key: 'policy-management',
     label: '策略管理',
-    path: '/approval/rules?section=policy-management',
-    breadcrumbs: ['策略管理'],
     icon: <ControlOutlined />,
-  },
-  {
-    key: 'ai-compliance',
-    label: 'AI合规',
-    icon: <SafetyCertificateOutlined />,
     children: [
+      {
+        key: 'approval-rules',
+        label: '规则管理',
+        path: '/approval/rules?section=policy-management',
+        breadcrumbs: ['策略管理', '规则管理'],
+      },
       {
         key: 'prompt-safety',
         label: '内容安全检测',
         path: '/ai-compliance/prompt-safety',
-        breadcrumbs: ['AI合规', '内容安全检测'],
+        breadcrumbs: ['策略管理', '内容安全检测'],
       },
       {
         key: 'code-safety',
         label: '代码安全防护',
         path: '/ai-compliance/code-safety',
-        breadcrumbs: ['AI合规', '代码安全防护'],
+        breadcrumbs: ['策略管理', '代码安全防护'],
       },
       {
         key: 'multimodal-guard',
         label: '多模态内容防护',
         path: '/ai-compliance/multimodal-guard',
-        breadcrumbs: ['AI合规', '多模态内容防护'],
+        breadcrumbs: ['策略管理', '多模态内容防护'],
       },
       {
         key: 'safe-steer',
         label: '推理时安全引导',
         path: '/ai-compliance/safe-steer',
-        breadcrumbs: ['AI合规', '推理时安全引导'],
+        breadcrumbs: ['策略管理', '推理时安全引导'],
       },
       {
         key: 'rag-guard',
         label: 'RAG防护',
         path: '/ai-compliance/rag-guard',
-        breadcrumbs: ['AI合规', 'RAG防护'],
+        breadcrumbs: ['策略管理', 'RAG防护'],
       },
       {
         key: 'mcp-guard',
         label: 'MCP防护',
         path: '/ai-compliance/mcp-guard',
-        breadcrumbs: ['AI合规', 'MCP防护'],
+        breadcrumbs: ['策略管理', 'MCP防护'],
       },
       {
         key: 'a2a-guard',
         label: 'A2A防护',
         path: '/ai-compliance/a2a-guard',
-        breadcrumbs: ['AI合规', 'A2A防护'],
+        breadcrumbs: ['策略管理', 'A2A防护'],
       },
     ],
   },
@@ -149,10 +147,10 @@ const navSections: NavSection[] = [
 ];
 
 const defaultTarget: NavTarget = {
-  sectionKey: 'ai-compliance',
+  sectionKey: 'policy-management',
   label: '内容安全检测',
   path: '/ai-compliance/prompt-safety',
-  breadcrumbs: ['AI合规', '内容安全检测'],
+  breadcrumbs: ['策略管理', '内容安全检测'],
   isChild: true,
 };
 

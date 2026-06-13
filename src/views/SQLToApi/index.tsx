@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Table, Button, Input, Select, Space, Tag, message, Modal, Drawer } from 'antd';
-import { PlusOutlined, SearchOutlined, ReloadOutlined, EditOutlined, DeleteOutlined, PlayCircleOutlined, StopOutlined } from '@ant-design/icons';
+import { Card, Table, Button, Input, Select, Space, Tag, message, Modal } from 'antd';
+import { PlusOutlined, SearchOutlined, ReloadOutlined, DeleteOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import SqlEditorDrawer from './components/SqlEditorDrawer';
-import ApiDebugPage from './ApiDebugPage';
-import type { ApiDefinition, ApiStatus, SecurityLevel } from '../types';
+import type { ApiDefinition, ApiStatus, SecurityLevel } from './types';
 import { mockApiList } from './mockData';
 
 const { Option } = Select;
@@ -115,7 +114,7 @@ const SQLToApi: React.FC = () => {
 
   // 状态标签渲染
   const renderStatusTag = (status: ApiStatus) => {
-    const statusMap = {
+    const statusMap: Record<ApiStatus, { color: string; text: string }> = {
       draft: { color: 'gold', text: '草稿' },
       active: { color: 'green', text: '已发布' },
       deprecated: { color: 'default', text: '已停用' },
@@ -127,7 +126,7 @@ const SQLToApi: React.FC = () => {
 
   // 安全等级标签渲染
   const renderSecurityTag = (level: SecurityLevel) => {
-    const levelMap = {
+    const levelMap: Record<SecurityLevel, { color: string; text: string }> = {
       low: { color: 'green', text: '低' },
       medium: { color: 'orange', text: '中' },
       high: { color: 'red', text: '高' },

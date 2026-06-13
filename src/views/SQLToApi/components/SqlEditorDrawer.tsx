@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Drawer, Form, Input, Select, Button, Space, Table, Tag, message, Alert, Divider } from 'antd';
-import { SaveOutlined, PlayCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { Drawer, Form, Input, Select, Button, Table, Tag, message, Alert, Divider } from 'antd';
+import { SaveOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import type { ApiDefinition, Parameter, SecurityLevel } from '../types';
 
 const { TextArea } = Input;
@@ -100,7 +100,7 @@ const SqlEditorDrawer: React.FC<SqlEditorDrawerProps> = ({
   // 保存API
   const handleSave = async () => {
     try {
-      const values = await form.validateFields();
+      await form.validateFields();
       
       if (!sqlValue) {
         message.error('请输入SQL语句');
@@ -116,9 +116,9 @@ const SqlEditorDrawer: React.FC<SqlEditorDrawerProps> = ({
       
       // TODO: 替换为真实API调用
       // if (apiData) {
-      //   await updateApi(apiData.id, { ...values, sqlStatement: sqlValue, parameters });
+      //   await updateApi(apiData.id, { ...form.getFieldsValue(), sqlStatement: sqlValue, parameters });
       // } else {
-      //   await createApi({ ...values, sqlStatement: sqlValue, parameters });
+      //   await createApi({ ...form.getFieldsValue(), sqlStatement: sqlValue, parameters });
       // }
       
       await new Promise((resolve) => setTimeout(resolve, 500));

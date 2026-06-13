@@ -65,7 +65,7 @@ export const MOCK_SQL_HISTORY: SqlHistoryItem[] = [
  * @param sql SQL 语句
  * @param databaseId 数据库 ID
  */
-export const mockSqlExecution = (sql: string, databaseId?: string): SqlExecutionResult => {
+export const mockSqlExecution = (sql: string, _databaseId?: string): SqlExecutionResult => {
   const trimmedSql = sql.trim().toUpperCase();
   
   // 模拟 SELECT 查询

@@ -39,10 +39,10 @@ const ApiDebugPage: React.FC = () => {
     setDebugResult(null);
 
     try {
-      const values = await form.validateFields();
+      await form.validateFields();
       
       // TODO: 替换为真实API调用
-      // const response = await debugApi(apiData.id, values);
+      // const response = await debugApi(apiData.id, form.getFieldsValue());
       
       // 模拟延迟
       await new Promise((resolve) => setTimeout(resolve, 1000));

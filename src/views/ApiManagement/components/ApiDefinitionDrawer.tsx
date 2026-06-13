@@ -21,11 +21,9 @@ import {
   Card,
   Dropdown,
   Menu,
-  Tabs,
   Form,
   Input,
   Select,
-  InputNumber,
   Popconfirm,
 } from 'antd';
 import {
@@ -45,7 +43,13 @@ interface ApiParamSectionProps {
   columns: any[];
 }
 
-function ApiParamSection({ title, params, paramType, editing, columns }: ApiParamSectionProps) {
+function ApiParamSection({
+  title,
+  params,
+  paramType: _paramType,
+  editing: _editing,
+  columns,
+}: ApiParamSectionProps) {
   return (
     <div style={{ marginBottom: 16 }}>
       <Text strong style={{ fontSize: 13, marginBottom: 8, display: 'block' }}>
@@ -94,13 +98,13 @@ export default function ApiDefinitionDrawer({
   visible,
   apiId,
   onClose,
-  onEdit,
+  onEdit: _onEdit,
   width = 980,
 }: ApiDefinitionDrawerProps) {
   const [detail, setDetail] = useState<ApiDefinition | null>(null);
   const [loading, setLoading] = useState(false);
-  const [exportingOpenApi, setExportingOpenApi] = useState(false);
-  const [exportingWord, setExportingWord] = useState(false);
+  const [_exportingOpenApi, setExportingOpenApi] = useState(false);
+  const [_exportingWord, setExportingWord] = useState(false);
   const [editing, setEditing] = useState(false);
   const [errorCodes, setErrorCodes] = useState<ErrorCodeItem[]>([]);
   const [form] = Form.useForm();
@@ -217,7 +221,7 @@ export default function ApiDefinitionDrawer({
       key: 'code',
       width: 100,
       render: editing
-        ? (code: string, record: ErrorCodeItem, index: number) => (
+        ? (_code: string, _record: ErrorCodeItem, index: number) => (
             <Form.Item name={['errorCodes', index, 'code']} style={{ margin: 0 }}>
               <Input />
             </Form.Item>
@@ -230,7 +234,7 @@ export default function ApiDefinitionDrawer({
       key: 'message',
       width: 160,
       render: editing
-        ? (message: string, record: ErrorCodeItem, index: number) => (
+        ? (_message: string, _record: ErrorCodeItem, index: number) => (
             <Form.Item name={['errorCodes', index, 'message']} style={{ margin: 0 }}>
               <Input />
             </Form.Item>
@@ -242,7 +246,7 @@ export default function ApiDefinitionDrawer({
       dataIndex: 'description',
       key: 'description',
       render: editing
-        ? (description: string, record: ErrorCodeItem, index: number) => (
+        ? (_description: string, _record: ErrorCodeItem, index: number) => (
             <Form.Item name={['errorCodes', index, 'description']} style={{ margin: 0 }}>
               <Input />
             </Form.Item>
@@ -255,7 +259,7 @@ export default function ApiDefinitionDrawer({
             title: '操作',
             key: 'action',
             width: 80,
-            render: (_: any, record: ErrorCodeItem, index: number) => (
+            render: (_: any, _record: ErrorCodeItem, index: number) => (
               <Popconfirm
                 title="确定删除此错误码?"
                 onConfirm={() => {
@@ -283,7 +287,7 @@ export default function ApiDefinitionDrawer({
       width: 160,
       ellipsis: true,
       render: editing
-        ? (_: any, record: ApiParameter, index: number) => (
+        ? (_: any, _record: ApiParameter, index: number) => (
             <Form.Item name={['parameters', paramType, index, 'name']} style={{ margin: 0 }}>
               <Input />
             </Form.Item>
@@ -296,7 +300,7 @@ export default function ApiDefinitionDrawer({
       key: 'type',
       width: 100,
       render: editing
-        ? (_: any, record: ApiParameter, index: number) => (
+        ? (_: any, _record: ApiParameter, index: number) => (
             <Form.Item name={['parameters', paramType, index, 'type']} style={{ margin: 0 }}>
               <Select>
                 <Select.Option value="String">String</Select.Option>
@@ -316,7 +320,7 @@ export default function ApiDefinitionDrawer({
       width: 150,
       ellipsis: true,
       render: editing
-        ? (_: any, record: ApiParameter, index: number) => (
+        ? (_: any, _record: ApiParameter, index: number) => (
             <Form.Item name={['parameters', paramType, index, 'defaultValue']} style={{ margin: 0 }}>
               <Input />
             </Form.Item>
@@ -330,7 +334,7 @@ export default function ApiDefinitionDrawer({
       width: 200,
       ellipsis: true,
       render: editing
-        ? (_: any, record: ApiParameter, index: number) => (
+        ? (_: any, _record: ApiParameter, index: number) => (
             <Form.Item name={['parameters', paramType, index, 'example']} style={{ margin: 0 }}>
               <Input />
             </Form.Item>
@@ -343,7 +347,7 @@ export default function ApiDefinitionDrawer({
       key: 'description',
       ellipsis: true,
       render: editing
-        ? (_: any, record: ApiParameter, index: number) => (
+        ? (_: any, _record: ApiParameter, index: number) => (
             <Form.Item name={['parameters', paramType, index, 'description']} style={{ margin: 0 }}>
               <Input />
             </Form.Item>
@@ -351,24 +355,6 @@ export default function ApiDefinitionDrawer({
         : (description: string) => description || '-',
     },
   ];
-
-  // 渲染API参数表格
-  const renderApiParamTable = (params: ApiParameter[], paramType: ApiParamType) => (
-    <Table
-      size="small"
-      dataSource={params}
-      rowKey={(record) => record.id || record.name}
-      pagination={false}
-      columns={createApiParamColumns(paramType)}
-      locale={{
-        emptyText: (
-          <div style={{ padding: 16 }}>
-            <Text type="secondary">暂无参数</Text>
-          </div>
-        ),
-      }}
-    />
-  );
 
   return (
     <Drawer

@@ -91,6 +91,17 @@ function downloadJson(filename: string, data: unknown) {
   URL.revokeObjectURL(url);
 }
 
+type CodeLogRow = {
+  id: string;
+  detectAt: string;
+  service: string;
+  file: string;
+  category: string;
+  level: string;
+  action: string;
+  detail: string;
+};
+
 export default function VerificationHistory() {
   const [mode, setMode] = useState<VerifyMode>('multimodal');
   const [search, setSearch] = useState<string>('');
@@ -371,6 +382,105 @@ export default function VerificationHistory() {
     return mode === 'multimodal' ? multimodal : text;
   }, [mode]);
 
+  const codeLogRows: CodeLogRow[] = useMemo(
+    () => [
+      {
+        id: 'c1',
+        detectAt: '2026-06-13 10:42:15',
+        service: 'payment-gateway',
+        file: 'AuthSignService.ts:18',
+        category: '不安全的加密识别策略',
+        level: '高危',
+        action: '阻断发布',
+        detail: '命中 MD5 黑名单算法，已按高危加密策略记录并外送整改通知。',
+      },
+      {
+        id: 'c2',
+        detectAt: '2026-06-13 10:42:15',
+        service: 'payment-gateway',
+        file: 'deploy.sh:05',
+        category: '权限提升识别策略',
+        level: '高危',
+        action: '安全告警',
+        detail: '检测到 sudo + 服务重启链路，已写入提权风险日志并通知安全运营。',
+      },
+      {
+        id: 'c3',
+        detectAt: '2026-06-13 10:42:15',
+        service: 'payment-gateway',
+        file: 'TokenUtil.ts:27',
+        category: '数据泄露的识别策略',
+        level: '中危',
+        action: '生成工单',
+        detail: '发现 accessToken 日志打印，已按敏感字段泄露规则外送整改工单。',
+      },
+      {
+        id: 'c4',
+        detectAt: '2026-06-13 10:42:15',
+        service: 'payment-gateway',
+        file: 'RandomCode.js:42',
+        category: '代码弱风险检测规则',
+        level: '中危',
+        action: '记录审计',
+        detail: '命中弱随机数规则，已关联代码风险分类规则并输出结构化结果。',
+      },
+    ],
+    []
+  );
+
+  const codeLogColumns: ColumnsType<CodeLogRow> = useMemo(
+    () => [
+      {
+        title: '检测时间',
+        dataIndex: 'detectAt',
+        key: 'detectAt',
+        width: 160,
+      },
+      {
+        title: '服务',
+        dataIndex: 'service',
+        key: 'service',
+        width: 150,
+      },
+      {
+        title: '文件位置',
+        dataIndex: 'file',
+        key: 'file',
+        width: 180,
+        render: (value: string) => <span style={{ fontWeight: 600 }}>{value}</span>,
+      },
+      {
+        title: '检测策略',
+        dataIndex: 'category',
+        key: 'category',
+        width: 180,
+      },
+      {
+        title: '等级',
+        dataIndex: 'level',
+        key: 'level',
+        width: 100,
+        render: (value: string) => (
+          <Tag color={value === '高危' ? '#f5222d' : '#faad14'} style={{ fontWeight: 600 }}>
+            {value}
+          </Tag>
+        ),
+      },
+      {
+        title: '外送动作',
+        dataIndex: 'action',
+        key: 'action',
+        width: 120,
+      },
+      {
+        title: '检测日志',
+        dataIndex: 'detail',
+        key: 'detail',
+      },
+    ],
+    []
+  );
+
   const filteredRows = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return baseRows;
@@ -540,6 +650,29 @@ export default function VerificationHistory() {
           )}
         </Space>
       </Card>
+
+      <Card
+        bordered={false}
+        style={{ background: '#ffffff', borderRadius: 12 }}
+        bodyStyle={{ padding: 16 }}
+      >
+        <Space direction="vertical" size={12} style={{ width: '100%' }}>
+          <div>
+            <div style={{ fontSize: 18, fontWeight: 700 }}>代码检测日志</div>
+            <div style={{ marginTop: 6, color: 'rgba(0,0,0,0.45)', fontSize: 13 }}>
+              展示代码弱风险检测规则、不安全的加密识别策略、权限提升识别策略、数据泄露识别策略，以及代码风险分类、风险等级判定和结构化输出模板相关的外送日志。
+            </div>
+          </div>
+
+          <Table
+            rowKey="id"
+            columns={codeLogColumns}
+            dataSource={codeLogRows}
+            pagination={false}
+          />
+        </Space>
+      </Card>
+
       <Modal
         visible={detailVisible}
         title="验证结果详情"
@@ -599,4 +732,3 @@ export default function VerificationHistory() {
     </div>
   );
 }
-

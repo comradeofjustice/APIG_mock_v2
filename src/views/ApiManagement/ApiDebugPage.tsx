@@ -28,7 +28,6 @@ import {
 import {
   SendOutlined,
   ClearOutlined,
-  PlusOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
 import type { DataNode } from 'antd/es/tree';
@@ -36,7 +35,7 @@ import type { ColumnsType } from 'antd/es/table';
 import type { ReactNode } from 'react';
 import type { ApiListItem, ApiParamItem, ApiDebugResponse, ApiServiceNode } from './types';
 import { queryServices, queryApisByService, sendDebugRequest, getApiDetail } from './services';
-import { MOCK_API_LIST, SERVICE_API_MAP } from './mockData';
+import { SERVICE_API_MAP } from './mockData';
 
 const { Text } = Typography;
 
@@ -55,7 +54,7 @@ export default function ApiDebugPage() {
   const [treeData, setTreeData] = useState<ServiceTreeData[]>([]);
   const [selectedApi, setSelectedApi] = useState<ApiListItem | null>(null);
   const [_selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
-  const [treeLoading, setTreeLoading] = useState(false);
+  const [_treeLoading, setTreeLoading] = useState(false);
   const [searchMode, setSearchMode] = useState<'service' | 'api'>('service');
   const [searchValue, setSearchValue] = useState('');
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);

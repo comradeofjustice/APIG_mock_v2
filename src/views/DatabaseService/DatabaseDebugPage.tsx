@@ -29,6 +29,7 @@ const { Text } = Typography;
 
 interface DatabaseDebugPageProps {
   databaseId?: string;
+  mode?: string;
 }
 
 export default function DatabaseDebugPage({
@@ -222,7 +223,7 @@ export default function DatabaseDebugPage({
                     <Table
                       size="small"
                       dataSource={executionResult.data}
-                      rowKey={(record, index) => index?.toString() || '0'}
+                      rowKey={(_, index) => index?.toString() || '0'}
                       pagination={{ pageSize: 10, size: 'small' }}
                       columns={executionResult.columns?.map(col => ({
                         title: col,
